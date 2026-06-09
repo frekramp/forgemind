@@ -86,14 +86,14 @@ export function ConnectButton({
       {open && (
         <>
           <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="fixed left-1/2 top-1/2 z-50 w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-border bg-panel p-4 shadow-2xl">
-            <div className="mb-3 flex items-center justify-between">
+          <div className="fixed left-1/2 top-1/2 z-50 flex max-h-[80vh] w-[320px] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border border-border bg-panel p-4 shadow-2xl">
+            <div className="mb-3 flex shrink-0 items-center justify-between">
               <span className="text-sm font-semibold">Choose a wallet</span>
               <button onClick={() => setOpen(false)} className="text-dim hover:text-text">
                 <X size={16} />
               </button>
             </div>
-            <div className="space-y-1.5">
+            <div className="-mr-1 space-y-1.5 overflow-y-auto pr-1">
               {wallets.map((c) => (
                 <button
                   key={c.uid}

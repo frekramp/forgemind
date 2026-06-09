@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --color-bg: #0b0b0e;
+  --color-panel: #131318;
+  --color-panel-2: #1a1a21;
+  --color-border: #26262e;
+  --color-border-strong: #34343f;
+  --color-text: #e7e7ea;
+  --color-muted: #9a9aa5;
+  --color-dim: #6b6b75;
+  --color-ember: #f4632a;
+  --color-ember-bright: #ff7a45;
+  --color-ember-deep: #c2410c;
+  --color-gain: #34d399;
+  --color-loss: #f43f5e;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.label {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-dim);
+  font-weight: 600;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a33;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glow-ember {
+  box-shadow:
+    0 0 0 1px rgba(244, 99, 42, 0.25),
+    0 8px 40px -12px rgba(244, 99, 42, 0.35);
+}
+
+/* gradient mesh backdrop for the hero / app shell */
+.bg-forge {
+  background:
+    radial-gradient(60rem 60rem at 85% -10%, rgba(244, 99, 42, 0.07), transparent 60%),
+    radial-gradient(50rem 50rem at -10% 110%, rgba(244, 99, 42, 0.04), transparent 55%),
+    var(--color-bg);
+}
+
+/* masked hairline grid for hero depth */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 62px 62px;
+  -webkit-mask-image: radial-gradient(46rem 34rem at 50% 32%, #000 10%, transparent 72%);
+  mask-image: radial-gradient(46rem 34rem at 50% 32%, #000 10%, transparent 72%);
+}
+
+/* subtle film grain for tactile, non-flat depth (non-interactive) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.02;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* SVG line draw-on for the projection chart */
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animate-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawLine 1.5s ease-out forwards;
+}
+
+/* gradient text for accent words */
+.text-gradient-ember {
+  background: linear-gradient(95deg, #ff7a45, #f4632a 55%, #c2410c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,445 @@
+// Hand-authored ABI for ForgeVault (must match contracts/src/ForgeVault.sol).
+// `as const` enables wagmi/viem type inference.
+export const forgeVaultAbi = [
+  { type: "function", name: "deposit", stateMutability: "payable", inputs: [], outputs: [] },
+  {
+    type: "function",
+    name: "withdraw",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "amount", type: "uint256" }],
+    outputs: [],
+  },
+  // --- autonomous keeper (opt-in delegation) ---
+  {
+    type: "function",
+    name: "authorizeAgent",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "compound", type: "bool" },
+      { name: "rebalance", type: "bool" },
+      { name: "expiry", type: "uint64" },
+    ],
+    outputs: [],
+  },
+  { type: "function", name: "revokeAgent", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  {
+    type: "function",
+    name: "agentClaimYield",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "agentSetMode",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "user", type: "address" },
+      { name: "newMode", type: "uint8" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "agentCan",
+    stateMutability: "view",
+    inputs: [
+      { name: "user", type: "address" },
+      { name: "wantRebalance", type: "bool" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "agentAuth",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [
+      { name: "compound", type: "bool" },
+      { name: "rebalance", type: "bool" },
+      { name: "expiry", type: "uint64" },
+    ],
+  },
+  { type: "function", name: "agent", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "address" }] },
+  {
+    type: "function",
+    name: "setMode",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "newMode", type: "uint8" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "setHalvingGoal",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "goal", type: "uint256" }],
+    outputs: [],
+  },
+  { type: "function", name: "claimYield", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  { type: "function", name: "withdrawAll", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  {
+    type: "function",
+    name: "withdrawable",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getProgress",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [
+      { name: "percent", type: "uint256" },
+      { name: "current", type: "uint256" },
+      { name: "goal", type: "uint256" },
+      { name: "daysRemaining", type: "uint256" },
+    ],
+  },
+  {
+    type: "function",
+    name: "getProjectedStack",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getVaultState",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [
+      { name: "userMode", type: "uint8" },
+      { name: "stack", type: "uint256" },
+      { name: "growPrincipal", type: "uint256" },
+      { name: "pendingYield", type: "uint256" },
+      { name: "total", type: "uint256" },
+      { name: "goal", type: "uint256" },
+      { name: "daysToHalving", type: "uint256" },
+      { name: "projected", type: "uint256" },
+    ],
+  },
+  {
+    type: "function",
+    name: "mode",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "uint8" }],
+  },
+  {
+    type: "function",
+    name: "totalDeposited",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "halvingGoal",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "totalValueLocked",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "usersLength",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getUsers",
+    stateMutability: "view",
+    inputs: [
+      { name: "offset", type: "uint256" },
+      { name: "limit", type: "uint256" },
+    ],
+    outputs: [{ name: "page", type: "address[]" }],
+  },
+  {
+    type: "function",
+    name: "globalStats",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "tvl", type: "uint256" },
+      { name: "userCount", type: "uint256" },
+      { name: "aprBps_", type: "uint256" },
+      { name: "daysToHalving", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "Deposited",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "mode", type: "uint8", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "Withdrawn",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "yieldPaid", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ModeChanged",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "mode", type: "uint8", indexed: false },
+      { name: "moved", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "GoalSet",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "goal", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "YieldClaimed",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+    ],
+  },
+] as const;
+
+// Hand-authored ABI for ForgeProfile (must match contracts/src/ForgeProfile.sol).
+export const forgeProfileAbi = [
+  {
+    type: "function",
+    name: "claimMission",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "id", type: "uint8" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "setUsername",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "name", type: "string" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "xp",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "username",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "string" }],
+  },
+  {
+    type: "function",
+    name: "levelOf",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "missionXp",
+    stateMutability: "pure",
+    inputs: [{ name: "id", type: "uint8" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "profileOf",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [
+      { name: "totalXp", type: "uint256" },
+      { name: "level", type: "uint256" },
+      { name: "claimedCount", type: "uint256" },
+      { name: "met", type: "bool[]" },
+      { name: "done", type: "bool[]" },
+    ],
+  },
+  {
+    type: "function",
+    name: "usersLength",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getUsers",
+    stateMutability: "view",
+    inputs: [
+      { name: "offset", type: "uint256" },
+      { name: "limit", type: "uint256" },
+    ],
+    outputs: [{ name: "page", type: "address[]" }],
+  },
+  {
+    type: "event",
+    name: "MissionClaimed",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "missionId", type: "uint8", indexed: true },
+      { name: "xpAwarded", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "UsernameSet",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "name", type: "string", indexed: false },
+    ],
+  },
+] as const;
+
+// Hand-authored ABI for ForgeActionLog (must match contracts/src/ForgeActionLog.sol).
+// The on-chain record of WHY the agent acted: engine (Manual/Rules/Claude) + reason.
+const ACTIONLOG_ENTRY_COMPONENTS = [
+  { name: "actor", type: "address" },
+  { name: "kind", type: "uint8" },
+  { name: "engine", type: "uint8" },
+  { name: "attested", type: "bool" }, // true => signature from trustedSigner verified
+  { name: "timestamp", type: "uint64" },
+  { name: "amount", type: "uint256" },
+  { name: "reason", type: "string" },
+] as const;
+
+export const forgeActionLogAbi = [
+  {
+    type: "function",
+    name: "log",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "kind", type: "uint8" },
+      { name: "engine", type: "uint8" },
+      { name: "amount", type: "uint256" },
+      { name: "reason", type: "string" },
+    ],
+    outputs: [{ name: "id", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "logAttested",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "actor", type: "address" },
+      { name: "kind", type: "uint8" },
+      { name: "engine", type: "uint8" },
+      { name: "amount", type: "uint256" },
+      { name: "reason", type: "string" },
+      { name: "nonce", type: "uint256" },
+      { name: "sig", type: "bytes" },
+    ],
+    outputs: [{ name: "id", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "attestNonce",
+    stateMutability: "view",
+    inputs: [{ name: "actor", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "trustedSigner",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
+    type: "function",
+    name: "setTrustedSigner",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "newSigner", type: "address" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "total",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "userCount",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "getEntry",
+    stateMutability: "view",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [{ name: "", type: "tuple", components: ACTIONLOG_ENTRY_COMPONENTS }],
+  },
+  {
+    type: "function",
+    name: "getRecent",
+    stateMutability: "view",
+    inputs: [{ name: "limit", type: "uint256" }],
+    outputs: [{ name: "out", type: "tuple[]", components: ACTIONLOG_ENTRY_COMPONENTS }],
+  },
+  {
+    type: "function",
+    name: "getByUser",
+    stateMutability: "view",
+    inputs: [
+      { name: "user", type: "address" },
+      { name: "offset", type: "uint256" },
+      { name: "limit", type: "uint256" },
+    ],
+    outputs: [{ name: "out", type: "tuple[]", components: ACTIONLOG_ENTRY_COMPONENTS }],
+  },
+  {
+    type: "event",
+    name: "ActionLogged",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true },
+      { name: "actor", type: "address", indexed: true },
+      { name: "kind", type: "uint8", indexed: false },
+      { name: "engine", type: "uint8", indexed: false },
+      { name: "attested", type: "bool", indexed: false },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "reason", type: "string", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "TrustedSignerUpdated",
+    inputs: [
+      { name: "previousSigner", type: "address", indexed: true },
+      { name: "newSigner", type: "address", indexed: true },
+    ],
+  },
+] as const;

@@ -6,8 +6,13 @@ import { forgeVaultAbi, forgeProfileAbi } from "@/lib/abi";
 import { VAULT_ADDRESS, PROFILE_ADDRESS, isVaultDeployed, isProfileDeployed } from "@/lib/contracts";
 import type { AgentAction, TraceStep } from "@/lib/agent";
 import { MISSIONS } from "@/lib/missions";
+import { rateLimit, clientIp, originAllowed } from "@/lib/ratelimit";
 
 export const maxDuration = 30;
+
+// Public, unauthenticated endpoint that drives a paid LLM — guard it against cost-abuse.
+const AGENT_RATE_LIMIT = 20; // requests
+const AGENT_RATE_WINDOW_MS = 60_000; // per minute, per IP
 
 const publicClient = createPublicClient({ chain: liteforge, transport: http() });
 
@@ -257,6 +262,17 @@ function sanitizeState(x: unknown): State | null {
 }
 
 export async function POST(request: Request) {
+  // Block cross-site drive-by calls, then cap request volume per IP so a public URL can't
+  // burn the LLM budget. (Per-request input is already bounded below.)
+  if (!originAllowed(request)) return Response.json({ error: "forbidden" }, { status: 403 });
+  const rl = rateLimit(`agent:${clientIp(request)}`, AGENT_RATE_LIMIT, AGENT_RATE_WINDOW_MS);
+  if (!rl.ok) {
+    return Response.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "retry-after": String(rl.retryAfter) } }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     messages?: { role: "user" | "assistant"; content: string }[];
     address?: string;

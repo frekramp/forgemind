@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { createPublicClient, createWalletClient, http, formatEther, getAddress, type Address } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { liteforge } from "@/lib/chains";
@@ -70,12 +71,25 @@ function keeperAccount() {
   }
 }
 
-// Auth gate so a public URL can't drive the keeper's wallet.
+// Constant-time string compare — avoids leaking the secret via response-timing.
+function safeEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false; // lengths differ → not equal (length isn't secret)
+  return timingSafeEqual(ab, bb);
+}
+
+// Auth gate so a public URL can't drive the keeper's wallet. Header-only: the secret is read
+// from `x-keeper-secret` or a `Authorization: Bearer …` header (what Vercel Cron sends) — never
+// a query string, which would leak into access logs, browser history, and Referer.
 function authorized(request: Request): boolean {
   const secret = process.env.KEEPER_CRON_SECRET;
   if (secret) {
-    const url = new URL(request.url);
-    return url.searchParams.get("secret") === secret || request.headers.get("x-keeper-secret") === secret;
+    const provided =
+      request.headers.get("x-keeper-secret") ??
+      request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+      null;
+    return provided !== null && safeEqual(provided, secret);
   }
   // No secret configured: allowed in development (so the "Run keeper now" demo button works),
   // but FAIL CLOSED in production — there you must set KEEPER_CRON_SECRET and call via cron.

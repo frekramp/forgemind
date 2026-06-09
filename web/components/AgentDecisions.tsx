@@ -100,7 +100,7 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
         {!deployed ? (
           <NotDeployed />
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 stagger">
             {isLoading && entries.length === 0 && <Empty text="Reading the on-chain decision ledger…" />}
             {!isLoading && entries.length === 0 && (
               <Empty text="No agent decisions yet — ask the guardian to act, then confirm." />
@@ -144,7 +144,7 @@ function Row({ e }: { e: DecisionEntry }) {
               type="button"
               onClick={() => setShowVerify((v) => !v)}
               title="Cryptographically verified — signed by the agent's trusted key, checked in logAttested(). Click to verify it yourself."
-              className="flex shrink-0 items-center gap-1 rounded-md border border-gain/40 bg-gain/5 px-1.5 py-0.5 text-[10px] font-medium text-gain transition-colors hover:bg-gain/15"
+              className="flex shrink-0 items-center gap-1 rounded-md border border-gain/40 bg-gain/5 px-1.5 py-0.5 text-[10px] font-medium text-gain transition-all hover:bg-gain/15 hover:shadow-[0_0_10px_-1px_rgba(52,211,153,0.55)]"
             >
               <ShieldCheck size={10} /> Verified
             </button>

@@ -28,7 +28,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
             still confirm each transaction in your wallet. Pick a strategy:
           </p>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 stagger">
             <StrategyCard
               active={config.strategy === "compound"}
               icon={Coins}

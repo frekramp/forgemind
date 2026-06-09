@@ -166,8 +166,11 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
       {/* atmosphere */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="hero-grid absolute inset-0" />
-        <div className="absolute left-1/2 top-[6%] h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-ember/[0.09] blur-[130px]" />
-        <div className="absolute bottom-[-12%] left-1/2 h-[22rem] w-[42rem] -translate-x-1/2 rounded-full bg-ember-deep/[0.1] blur-[120px]" />
+        <div className="animate-float-glow absolute left-1/2 top-[6%] h-[30rem] w-[30rem] rounded-full bg-ember/[0.09] blur-[130px]" />
+        <div
+          className="animate-float-glow absolute bottom-[-12%] left-1/2 h-[22rem] w-[42rem] rounded-full bg-ember-deep/[0.1] blur-[120px]"
+          style={{ animationDelay: "-4.5s", animationDuration: "11s" }}
+        />
       </div>
 
       <div className="relative flex flex-col items-center">

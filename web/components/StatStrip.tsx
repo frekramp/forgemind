@@ -24,11 +24,11 @@ export function StatStrip({ v }: { v: ReturnType<typeof useVault> }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
       {items.map(({ label, value, unit, Icon, accent }) => (
         <div
           key={label}
-          className="rounded-xl border border-border bg-panel p-4 transition-colors hover:border-border-strong"
+          className="lift rounded-xl border border-border bg-panel p-4 hover:border-border-strong"
         >
           <div className="flex items-center justify-between">
             <span className="label">{label}</span>

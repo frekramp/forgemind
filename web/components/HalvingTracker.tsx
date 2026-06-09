@@ -59,7 +59,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-bg">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-ember-deep via-ember to-ember-bright transition-[width] duration-700 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-ember-deep via-ember to-ember-bright transition-[width] duration-700 ease-out animate-grow-x"
               style={{ width: `${progress}%` }}
             />
           </div>

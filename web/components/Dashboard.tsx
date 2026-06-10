@@ -25,7 +25,7 @@ import { AgentDecisions } from "./AgentDecisions";
 import { useDemoMode } from "./DemoProvider";
 import { isVaultDeployed } from "@/lib/contracts";
 import { countdownTo, type Countdown } from "@/lib/halving";
-import { Flame, ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2 } from "lucide-react";
+import { Flame, ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap } from "lucide-react";
 import { useEffect } from "react";
 
 const NEEDS_WALLET: TabKey[] = ["overview", "missions", "autopilot"];
@@ -57,6 +57,7 @@ export function Dashboard() {
     if (tab === "autopilot")
       return (
         <div className="space-y-5">
+          <AutomationIntro />
           <KeeperPanel v={v} />
           <AutoPilot ap={ap} />
         </div>
@@ -142,6 +143,39 @@ function Orientation() {
             <Icon size={12} className="text-ember" /> {label}
           </span>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/** Frames the two automation panels below as a deliberate spectrum of trust, so they don't
+ *  read as redundant. Keeper = hands-off/delegated; Auto-Pilot = assisted/you-confirm. */
+function AutomationIntro() {
+  return (
+    <div className="card-elev rounded-2xl border border-border bg-panel p-5">
+      <h2 className="font-display text-[1.3rem] leading-tight tracking-tight">Two ways to automate.</h2>
+      <p className="mt-1 text-sm text-muted">
+        Same job - compound yield and rebalance toward your halving goal - at two levels of trust. Pick one below.
+      </p>
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-ember/30 bg-ember-soft p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-ember">
+            <Zap size={15} /> Keeper — fully hands-off
+          </div>
+          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
+            Delegate once on-chain; it runs 24/7 server-side with <span className="text-text">no browser and no per-tx
+            clicks</span>. Capped by an expiry and revocable instantly.
+          </p>
+        </div>
+        <div className="rounded-xl border border-border bg-bg p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-text">
+            <Bot size={15} className="text-dim" /> Auto-Pilot — you stay in control
+          </div>
+          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
+            Runs on a timer in your browser and <span className="text-text">you confirm every transaction</span>.
+            Nothing is delegated or auto-signed.
+          </p>
+        </div>
       </div>
     </div>
   );

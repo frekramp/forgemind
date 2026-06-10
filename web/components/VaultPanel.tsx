@@ -9,7 +9,7 @@ import { fmtNum } from "@/lib/format";
 import { useCountUp } from "@/hooks/useCountUp";
 import type { useVault } from "@/hooks/useVault";
 import { cn } from "@/lib/cn";
-import { ArrowDownLeft, ArrowUpRight, Coins, Loader2, Shield, TrendingUp } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Coins, Info, Loader2, Shield, TrendingUp } from "lucide-react";
 
 async function safe(fn: () => Promise<unknown>) {
   try {
@@ -70,6 +70,16 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
         </div>
 
         <ModeToggle mode={s?.mode ?? Mode.Stack} disabled={busy} onChange={(m) => safe(() => v.setMode(m))} />
+
+        {/* Where the 5% comes from - answers the "is this real yield?" question up front. */}
+        <div className="flex items-start gap-2 rounded-lg border border-border bg-bg px-3 py-2 text-[11px] leading-relaxed text-dim">
+          <Info size={13} className="mt-0.5 shrink-0 text-ember" />
+          <span>
+            <span className="text-text">The 5% is simulated</span> on testnet, paid from a pre-funded reward pool (not
+            real revenue). On mainnet the vault plugs into a real yield source - lending interest, LP fees, or liquid
+            staking - through a swappable strategy. Your principal is always custodied <span className="text-text">1:1</span>.
+          </span>
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <AmountBox

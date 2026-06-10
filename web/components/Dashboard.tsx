@@ -25,6 +25,7 @@ import { useDemoMode } from "./DemoProvider";
 import { isVaultDeployed } from "@/lib/contracts";
 import { countdownTo, type Countdown } from "@/lib/halving";
 import { ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap } from "lucide-react";
+import { cn } from "@/lib/cn";
 import { useEffect } from "react";
 
 const NEEDS_WALLET: TabKey[] = ["overview", "missions", "autopilot"];
@@ -53,14 +54,7 @@ export function Dashboard() {
     if (tab === "decisions") return <AgentDecisions al={al} />;
     if (gated) return <ConnectPrompt />;
     if (tab === "missions") return <Missions m={missions} />;
-    if (tab === "autopilot")
-      return (
-        <div className="space-y-5">
-          <AutomationIntro />
-          <KeeperPanel v={v} />
-          <AutoPilot ap={ap} />
-        </div>
-      );
+    if (tab === "autopilot") return <AutomationTab v={v} ap={ap} />;
     // overview
     return (
       <div className="space-y-5">
@@ -146,36 +140,70 @@ function Orientation() {
   );
 }
 
-/** Frames the two automation panels below as a deliberate spectrum of trust, so they don't
- *  read as redundant. Keeper = hands-off/delegated; Auto-Pilot = assisted/you-confirm. */
-function AutomationIntro() {
+/** Automation as a real selector: pick a tier and only that panel renders. (Stacking both panels
+ *  under non-clickable explainer cards was confusing.) */
+function AutomationTab({ v, ap }: { v: ReturnType<typeof useVault>; ap: ReturnType<typeof useAutoPilot> }) {
+  const [tier, setTier] = useState<"autopilot" | "keeper">("autopilot");
   return (
-    <div className="card-elev rounded-2xl border border-border bg-panel p-5">
-      <h2 className="font-display text-[1.3rem] leading-tight tracking-tight">Two ways to automate.</h2>
-      <p className="mt-1 text-sm text-muted">
-        Compound yield and rebalance toward your halving goal, at two levels of trust. Pick one below.
-      </p>
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-ember/30 bg-ember-soft p-4">
-          <div className="flex items-center gap-2 text-sm font-semibold text-ember">
-            <Zap size={15} /> Keeper — fully hands-off
-          </div>
-          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
-            Delegate once on-chain; it runs 24/7 server-side with <span className="text-text">no browser and no per-tx
-            clicks</span>. Capped by an expiry and revocable instantly.
-          </p>
-        </div>
-        <div className="rounded-xl border border-border bg-bg p-4">
-          <div className="flex items-center gap-2 text-sm font-semibold text-text">
-            <Bot size={15} className="text-dim" /> Auto-Pilot — you stay in control
-          </div>
-          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
-            Runs on a timer in your browser and <span className="text-text">you confirm every transaction</span>.
-            Nothing is delegated or auto-signed.
-          </p>
+    <div className="space-y-5">
+      <div className="card-elev rounded-2xl border border-border bg-panel p-5">
+        <h2 className="font-display text-[1.3rem] leading-tight tracking-tight">Two ways to automate.</h2>
+        <p className="mt-1 text-sm text-muted">
+          Compound yield and rebalance toward your halving goal. Choose how much you hand over:
+        </p>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <TierCard
+            active={tier === "autopilot"}
+            onClick={() => setTier("autopilot")}
+            icon={Bot}
+            title="Auto-Pilot"
+            tag="you stay in control"
+            desc="Runs on a timer in your browser; you confirm every transaction. Nothing is delegated or auto-signed."
+          />
+          <TierCard
+            active={tier === "keeper"}
+            onClick={() => setTier("keeper")}
+            icon={Zap}
+            title="Keeper"
+            tag="fully hands-off"
+            desc="Delegate once on-chain and a server keeper acts 24/7 — no browser, no per-tx clicks. Capped + revocable."
+          />
         </div>
       </div>
+      {tier === "autopilot" ? <AutoPilot ap={ap} /> : <KeeperPanel v={v} />}
     </div>
+  );
+}
+
+function TierCard({
+  active,
+  onClick,
+  icon: Icon,
+  title,
+  tag,
+  desc,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: typeof Bot;
+  title: string;
+  tag: string;
+  desc: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "rounded-xl border p-4 text-left transition-all",
+        active ? "border-ember bg-ember-soft ring-1 ring-ember/20" : "border-border bg-bg hover:border-border-strong"
+      )}
+    >
+      <div className={cn("flex items-center gap-2 text-sm font-semibold", active ? "text-ember" : "text-text")}>
+        <Icon size={15} className={active ? "text-ember" : "text-dim"} /> {title}
+        <span className="ml-auto text-[10px] font-normal text-dim">{tag}</span>
+      </div>
+      <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{desc}</p>
+    </button>
   );
 }
 

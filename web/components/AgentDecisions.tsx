@@ -63,7 +63,10 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
     <Panel
       label="Agent Decisions"
       right={
-        <label className="flex cursor-pointer items-center gap-2 text-[11px] text-dim">
+        <label
+          className="flex cursor-pointer items-center gap-2 text-[11px] text-dim"
+          title="Write each agent decision on-chain as a verifiable record. Adds one extra wallet confirm per action; on by default."
+        >
           <span>Notarize on-chain</span>
           <button
             type="button"
@@ -71,14 +74,14 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
             aria-checked={notarize}
             onClick={() => setNotarize(!notarize)}
             className={cn(
-              "relative h-4 w-7 rounded-full transition-colors",
-              notarize ? "bg-ember" : "bg-border"
+              "relative h-5 w-9 shrink-0 rounded-full transition-colors",
+              notarize ? "bg-ember" : "bg-border-strong"
             )}
           >
             <span
               className={cn(
-                "absolute top-0.5 h-3 w-3 rounded-full bg-bg transition-transform",
-                notarize ? "translate-x-3.5" : "translate-x-0.5"
+                "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+                notarize ? "translate-x-4" : "translate-x-0.5"
               )}
             />
           </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useBalance, useDisconnect, useSwitchChain } from "wagmi";
-import { Flame } from "lucide-react";
+import { Logo } from "./Logo";
 import { Button } from "./ui/button";
 import { ConnectButton } from "./ConnectButton";
 import { ShareStackButton } from "./ShareStack";
@@ -20,9 +20,7 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-border bg-bg/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-5">
         <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-ember-bright to-ember-deep text-black shadow-[0_2px_16px_-4px_rgba(244,99,42,0.7)]">
-            <Flame size={18} />
-          </div>
+          <Logo size={36} />
           <div className="leading-none">
             <div className="text-[15px] font-semibold tracking-tight">ForgeMind</div>
             <div className="label mt-1.5">zkLTC smart vault</div>

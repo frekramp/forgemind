@@ -10,6 +10,7 @@ import { fmtNum, shortAddr } from "@/lib/format";
 import { HALVING_LABEL, daysToHalving } from "@/lib/halving";
 import { cn } from "@/lib/cn";
 import { Flame, Share2, X, Trophy, TrendingUp, Shield, Copy, Check, Target } from "lucide-react";
+import { Logo } from "./Logo";
 
 /** Header button that opens a screenshot-ready "Stack Card" with one-click sharing. */
 export function ShareStackButton() {
@@ -79,9 +80,7 @@ function ShareModal({ onClose }: { onClose: () => void }) {
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-ember-bright to-ember-deep text-black">
-              <Flame size={16} />
-            </div>
+            <Logo size={32} />
             <div className="leading-none">
               <div className="text-sm font-semibold tracking-tight">ForgeMind</div>
               <div className="label mt-1">zkLTC stack card</div>

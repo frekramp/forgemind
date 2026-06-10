@@ -24,7 +24,8 @@ import { AgentDecisions } from "./AgentDecisions";
 import { useDemoMode } from "./DemoProvider";
 import { isVaultDeployed } from "@/lib/contracts";
 import { countdownTo, type Countdown } from "@/lib/halving";
-import { Flame, ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap } from "lucide-react";
+import { ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap } from "lucide-react";
+import { Logo, LogoMark } from "./Logo";
 import { useEffect } from "react";
 
 const NEEDS_WALLET: TabKey[] = ["overview", "missions", "autopilot"];
@@ -226,6 +227,24 @@ function HalvingCountdown() {
   );
 }
 
+// Ambient rising embers for the hero (fixed values so SSR/client match — no Math.random).
+const HERO_EMBERS = [
+  { left: "6%", size: 3, delay: 0, dur: 9, drift: 10 },
+  { left: "14%", size: 2, delay: 3.2, dur: 12, drift: -8 },
+  { left: "23%", size: 4, delay: 6.1, dur: 10.5, drift: 14 },
+  { left: "33%", size: 2, delay: 1.4, dur: 13, drift: -6 },
+  { left: "42%", size: 3, delay: 4.6, dur: 11, drift: 9 },
+  { left: "50%", size: 2, delay: 7.3, dur: 9.5, drift: -12 },
+  { left: "58%", size: 3, delay: 2.1, dur: 12.5, drift: 6 },
+  { left: "67%", size: 4, delay: 5.7, dur: 10.5, drift: -10 },
+  { left: "76%", size: 2, delay: 0.9, dur: 11.5, drift: 12 },
+  { left: "84%", size: 3, delay: 3.9, dur: 9, drift: -7 },
+  { left: "92%", size: 2, delay: 6.6, dur: 13, drift: 9 },
+  { left: "47%", size: 2, delay: 8.4, dur: 10, drift: -5 },
+  { left: "29%", size: 2, delay: 9.6, dur: 12, drift: 7 },
+  { left: "71%", size: 3, delay: 10.5, dur: 11, drift: -9 },
+];
+
 function ConnectGate({ onDemo }: { onDemo: () => void }) {
   const features = [
     { n: "01", icon: ShieldCheck, title: "Stack & Grow", desc: "Hold zkLTC 1:1, or deploy it for a simulated 5% APY." },
@@ -242,13 +261,27 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
           className="animate-float-glow absolute bottom-[-12%] left-1/2 h-[22rem] w-[42rem] rounded-full bg-ember-deep/[0.1] blur-[120px]"
           style={{ animationDelay: "-4.5s", animationDuration: "11s" }}
         />
+        {HERO_EMBERS.map((e, i) => (
+          <span
+            key={i}
+            className="ember-particle"
+            style={
+              {
+                left: e.left,
+                width: e.size,
+                height: e.size,
+                animationDelay: `${e.delay}s`,
+                animationDuration: `${e.dur}s`,
+                "--drift": `${e.drift}px`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
       </div>
 
       <div className="relative flex flex-col items-center">
         <div className="animate-rise-in inline-flex items-center gap-2 rounded-full border border-ember/30 bg-ember-soft px-3 py-1.5 text-[11px] font-medium text-ember">
-          <span className="grid h-4 w-4 place-items-center rounded-full bg-ember text-[8px] text-black">
-            <Flame size={9} />
-          </span>
+          <LogoMark size={13} />
           LiteForge Hackathon · AI Agents track
         </div>
 

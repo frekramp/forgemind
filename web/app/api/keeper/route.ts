@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { createPublicClient, createWalletClient, http, formatEther, getAddress, type Address } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { liteforge } from "@/lib/chains";
@@ -71,12 +71,12 @@ function keeperAccount() {
   }
 }
 
-// Constant-time string compare — avoids leaking the secret via response-timing.
+// Constant-time compare that also hides length: both sides are SHA-256'd to a fixed 32 bytes
+// first, so neither the timing nor an early length return can reveal the secret's length.
 function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false; // lengths differ → not equal (length isn't secret)
-  return timingSafeEqual(ab, bb);
+  const ah = createHash("sha256").update(a).digest();
+  const bh = createHash("sha256").update(b).digest();
+  return timingSafeEqual(ah, bh);
 }
 
 // Auth gate so a public URL can't drive the keeper's wallet. Header-only: the secret is read
@@ -91,9 +91,10 @@ function authorized(request: Request): boolean {
       null;
     return provided !== null && safeEqual(provided, secret);
   }
-  // No secret configured: allowed in development (so the "Run keeper now" demo button works),
-  // but FAIL CLOSED in production — there you must set KEEPER_CRON_SECRET and call via cron.
-  return process.env.NODE_ENV !== "production";
+  // No secret configured: FAIL CLOSED by default everywhere. Unauthenticated calls are only
+  // allowed if you explicitly opt in for local dev with KEEPER_DEV_OPEN=true — so a forgotten
+  // KEEPER_CRON_SECRET can never silently leave the endpoint open (incl. on preview deploys).
+  return process.env.NODE_ENV !== "production" && process.env.KEEPER_DEV_OPEN === "true";
 }
 
 // Single-flight guard: prevents overlapping ticks (cron + manual) from racing nonces.
@@ -112,6 +113,11 @@ type State = readonly [number, bigint, bigint, bigint, bigint, bigint, bigint, b
 type Auth = readonly [boolean, boolean, bigint];
 
 export async function POST(request: Request) {
+  // Reject unexpected body encodings (form posts etc.); cron services send JSON or text/plain.
+  const ct = request.headers.get("content-type") ?? "";
+  if (ct && !/^(application\/json|text\/plain)/i.test(ct)) {
+    return Response.json({ error: "unsupported_media_type" }, { status: 415 });
+  }
   if (!authorized(request)) return Response.json({ error: "unauthorized" }, { status: 401 });
   const account = keeperAccount();
   if (!isVaultDeployed || !account) {

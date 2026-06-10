@@ -10,7 +10,7 @@ export function useCountUp(value: number, duration = 650) {
   useEffect(() => {
     const from = fromRef.current;
     const to = value;
-    if (from === to) return;
+    if (Math.abs(to - from) < 1e-9) return; // #16: skip re-animating on negligible float diffs
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {

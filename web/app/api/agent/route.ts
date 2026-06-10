@@ -36,6 +36,7 @@ async function readState(user: Address): Promise<State | null> {
       functionName: "getVaultState",
       args: [user],
     })) as readonly [number, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
+    if (!Array.isArray(d) || d.length < 8) return null; // guard against ABI drift / bad RPC data
     return {
       mode: Number(d[0]) === 1 ? "grow" : "stack",
       stack: +formatEther(d[1]),
@@ -273,6 +274,12 @@ export async function POST(request: Request) {
     );
   }
 
+  // Reject non-JSON bodies (form posts etc.) before parsing.
+  const ct = request.headers.get("content-type") ?? "";
+  if (ct && !/^application\/json/i.test(ct)) {
+    return Response.json({ error: "unsupported_media_type" }, { status: 415 });
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     messages?: { role: "user" | "assistant"; content: string }[];
     address?: string;
@@ -289,7 +296,13 @@ export async function POST(request: Request) {
   const actions: AgentAction[] = [];
   // In demo mode the client passes the demo vault state so the agent reasons over the same
   // numbers shown on screen instead of reading the (empty) chain for the demo address.
-  const getState = async (): Promise<State | null> => stateOverride ?? (await readState(user));
+  // Memoized: repeated getVaultState tool calls within one request reuse the first read
+  // instead of re-hitting the RPC (caps RPC amplification across the multi-step tool loop).
+  let cachedState: State | null | undefined; // undefined = not yet fetched
+  const getState = async (): Promise<State | null> => {
+    if (cachedState === undefined) cachedState = stateOverride ?? (await readState(user));
+    return cachedState;
+  };
 
   const hasKey = !!process.env.ANTHROPIC_API_KEY || !!process.env.AI_GATEWAY_API_KEY;
   if (hasKey) {
@@ -299,7 +312,10 @@ export async function POST(request: Request) {
         : "anthropic/claude-haiku-4.5";
       const result = await generateText({
         model,
-        system: SYSTEM,
+        system: stateOverride
+          ? SYSTEM +
+            "\n\nDEMO MODE: the vault state you can read is sample/demo data, not real on-chain balances. Help the user explore, but never imply these are their actual funds or that real value is at stake."
+          : SYSTEM,
         messages,
         tools: buildTools(getState, user, actions),
         stopWhen: stepCountIs(6),

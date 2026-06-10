@@ -109,7 +109,9 @@ export async function GET(request: Request) {
       const head = await client.getBlockNumber();
       // Bound the scan: use the deploy block if set, else clamp to a recent window so an
       // unset env can't trigger a genesis-to-head scan on every cache miss.
-      const SCAN_WINDOW = 500_000n;
+      // ~2.3 days @2s blocks when a deploy block isn't set. TODO: persist a lastScannedBlock
+      // watermark or use the Blockscout indexed API for production-scale feeds.
+      const SCAN_WINDOW = 100_000n;
       const floor = (deployBlock: bigint) => (deployBlock > 0n ? deployBlock : head > SCAN_WINDOW ? head - SCAN_WINDOW : 0n);
 
       // 1) decision log entries (the "why", on-chain)

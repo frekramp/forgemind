@@ -8,7 +8,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { zeroAddress } from "viem";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { vaultContract, isVaultDeployed, Mode } from "@/lib/contracts";
 import { toWei, weiToNum } from "@/lib/format";
 import { liteforge } from "@/lib/chains";
@@ -48,7 +48,7 @@ export function useVault() {
     const d = read.data as
       | readonly [number, bigint, bigint, bigint, bigint, bigint, bigint, bigint]
       | undefined;
-    if (!d) return undefined;
+    if (!d || !Array.isArray(d) || d.length < 8) return undefined; // #10: guard ABI drift / bad data
     return {
       mode: Number(d[0]) as Mode,
       stack: weiToNum(d[1]),
@@ -66,24 +66,37 @@ export function useVault() {
   const [hash, setHash] = useState<`0x${string}` | undefined>();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
+  const inFlight = useRef(false); // #13: guards against overlapping txs overwriting `hash`
+
   useEffect(() => {
     if (isSuccess) {
+      inFlight.current = false; // confirmed → next tx allowed
       read.refetch();
       const t = setTimeout(() => setHash(undefined), 1500);
       return () => clearTimeout(t);
     }
-  }, [isSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isSuccess]); // eslint-disable-line react-hooks/exhaustive-deps -- runs only on confirmation; read.refetch identity is stable
 
   const run = useCallback(
     async (functionName: string, args: unknown[] = [], value?: bigint) => {
-      const h = await writeContractAsync({
-        ...vaultContract,
-        functionName,
-        args,
-        value,
-      } as never);
-      setHash(h);
-      return h;
+      // #13: refuse a second tx while one is in flight so its hash can't clobber the first.
+      if (inFlight.current) throw new Error("A transaction is already in progress.");
+      inFlight.current = true;
+      try {
+        const h = await writeContractAsync({
+          ...vaultContract,
+          functionName,
+          args,
+          value,
+          // #12: dynamic functionName precludes wagmi's typed inference; `as never` bypasses the
+          // overload check. Behavior is correct — args are built per call site below.
+        } as never);
+        setHash(h);
+        return h;
+      } catch (e) {
+        inFlight.current = false; // rejected/failed → allow retry
+        throw e;
+      }
     },
     [writeContractAsync]
   );
@@ -93,6 +106,8 @@ export function useVault() {
     return undefined;
   }, []);
 
+  // ⚠️ #4: every hook above this line runs unconditionally on every render (rules-of-hooks
+  // compliant). The early returns below are render-time branches — do NOT add hooks past here.
   if (isDemo) {
     return {
       address: DEMO_ADDRESS,

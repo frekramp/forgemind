@@ -11,6 +11,7 @@ import { ConnectButton, NoWalletHint } from "./ConnectButton";
 import { VaultPanel } from "./VaultPanel";
 import { HalvingTracker } from "./HalvingTracker";
 import { AgentChat } from "./AgentChat";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { AgentInsight } from "./AgentInsight";
 import { StatStrip } from "./StatStrip";
 import { Tabs, type TabKey } from "./Tabs";
@@ -84,19 +85,23 @@ export function Dashboard() {
             {!isVaultDeployed && !isDemo && <DeployBanner />}
             <Tabs active={tab} onChange={setTab} />
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-              <div key={tab} className="animate-rise-in lg:col-span-7 xl:col-span-8">{renderTab()}</div>
+              <div key={tab} className="animate-rise-in lg:col-span-7 xl:col-span-8">
+                <ErrorBoundary label="this view">{renderTab()}</ErrorBoundary>
+              </div>
               <div className="lg:col-span-5 xl:col-span-4">
                 <div className="h-[660px] lg:sticky lg:top-20">
-                  <AgentChat
-                    v={v}
-                    record={al.record}
-                    onClaimMission={(id) => missions.claimMission(id).catch(() => {})}
-                    onAutoPilot={(strategy, cap) => {
-                      ap.setConfig({ strategy, cap });
-                      setTab("autopilot");
-                    }}
-                    onNavigate={setTab}
-                  />
+                  <ErrorBoundary label="the agent">
+                    <AgentChat
+                      v={v}
+                      record={al.record}
+                      onClaimMission={(id) => missions.claimMission(id).catch(() => {})}
+                      onAutoPilot={(strategy, cap) => {
+                        ap.setConfig({ strategy, cap });
+                        setTab("autopilot");
+                      }}
+                      onNavigate={setTab}
+                    />
+                  </ErrorBoundary>
                 </div>
               </div>
             </div>

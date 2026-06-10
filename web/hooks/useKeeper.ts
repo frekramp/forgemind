@@ -31,7 +31,9 @@ export function useKeeper() {
     query: { enabled: isVaultDeployed },
   });
 
-  const raw = authRead.data as readonly [boolean, boolean, bigint] | undefined;
+  const rawData = authRead.data as readonly [boolean, boolean, bigint] | undefined;
+  // #10: validate tuple shape before trusting it (guards ABI drift / malformed RPC data).
+  const raw = Array.isArray(rawData) && rawData.length >= 3 ? rawData : undefined;
   const now = nowSec();
   const auth: KeeperAuth = raw
     ? { compound: raw[0], rebalance: raw[1], expiry: Number(raw[2]) }
@@ -47,7 +49,7 @@ export function useKeeper() {
       const t = setTimeout(() => setHash(undefined), 1500);
       return () => clearTimeout(t);
     }
-  }, [isSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isSuccess]); // eslint-disable-line react-hooks/exhaustive-deps -- runs only on confirmation; authRead.refetch identity is stable
 
   async function authorize(compound: boolean, rebalance: boolean, durationSec: number) {
     const expiry = BigInt(Math.floor(Date.now() / 1000) + durationSec);
@@ -70,6 +72,8 @@ export function useKeeper() {
     return h;
   }
 
+  // ⚠️ #5: all hooks above run unconditionally (rules-of-hooks compliant). The returns below
+  // are render-time branches — do NOT add hooks past this point.
   if (isDemo) {
     const noop = async (): Promise<undefined> => undefined;
     return {

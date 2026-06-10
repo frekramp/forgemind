@@ -98,8 +98,10 @@ export async function GET(request: Request) {
       items = cache.items;
     } else {
       const head = await client.getBlockNumber();
-      // Bound the scan to a recent window when the deploy block isn't configured.
-      const SCAN_WINDOW = 500_000n;
+      // Bound the scan to a recent window when the deploy block isn't configured (~2.3 days
+      // @2s blocks). TODO: persist a lastScannedBlock watermark or use the Blockscout indexed
+      // API for production-scale feeds instead of re-scanning a large window per cache miss.
+      const SCAN_WINDOW = 100_000n;
       const fromBlock = VAULT_DEPLOY_BLOCK > 0n ? VAULT_DEPLOY_BLOCK : head > SCAN_WINDOW ? head - SCAN_WINDOW : 0n;
       items = await getLogsChunked(fromBlock, head);
       items.sort((a, b) => b.block - a.block || b.logIndex - a.logIndex);

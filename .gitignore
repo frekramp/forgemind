@@ -20,13 +20,3 @@ contracts/broadcast/
 # misc
 .DS_Store
 *.log
-
-# AI tooling + internal/working docs — keep out of the public repo
-**/CLAUDE.md
-**/AGENTS.md
-.claude/
-.cursor/
-.aider*
-SUBMISSION.md
-GO-LIVE.md
-DEMO.md

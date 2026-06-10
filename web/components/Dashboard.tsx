@@ -334,7 +334,8 @@ function DemoBanner({ onExit }: { onExit: () => void }) {
         Demo
       </span>
       <span className="text-muted">
-        You&apos;re viewing <span className="text-text">sample data</span> - no wallet connected and nothing is on-chain.
+        <span className="text-text">Sample data you can play with</span> - deposit, switch modes, set a goal, claim,
+        and chat with the agent. Nothing touches the chain.
       </span>
       <button
         onClick={onExit}

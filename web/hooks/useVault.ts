@@ -13,7 +13,7 @@ import { vaultContract, isVaultDeployed, Mode } from "@/lib/contracts";
 import { toWei, weiToNum } from "@/lib/format";
 import { liteforge } from "@/lib/chains";
 import { useDemoMode } from "@/components/DemoProvider";
-import { DEMO_ADDRESS, DEMO_WALLET_BALANCE, demoVaultState } from "@/lib/demo";
+import { DEMO_ADDRESS } from "@/lib/demo";
 
 export type VaultState = {
   mode: Mode;
@@ -29,7 +29,7 @@ export type VaultState = {
 
 export function useVault() {
   const { address, isConnected, chainId } = useAccount();
-  const { isDemo } = useDemoMode();
+  const { isDemo, demoVault } = useDemoMode();
   const enabled = !!address && isVaultDeployed;
 
   const { data: walletBal } = useBalance({
@@ -113,19 +113,19 @@ export function useVault() {
       address: DEMO_ADDRESS,
       isConnected: true,
       chainId: liteforge.id,
-      walletBalance: DEMO_WALLET_BALANCE,
-      state: demoVaultState(),
+      walletBalance: demoVault.walletBalance,
+      state: demoVault.state,
       isReading: false,
       refetch: noop,
       txPending: false,
       txConfirming: false,
       txHash: undefined as `0x${string}` | undefined,
-      deposit: noop,
-      withdraw: noop,
-      withdrawAll: noop,
-      setMode: noop,
-      setGoal: noop,
-      claimYield: noop,
+      deposit: demoVault.deposit,
+      withdraw: demoVault.withdraw,
+      withdrawAll: demoVault.withdrawAll,
+      setMode: demoVault.setMode,
+      setGoal: demoVault.setGoal,
+      claimYield: demoVault.claimYield,
     };
   }
 

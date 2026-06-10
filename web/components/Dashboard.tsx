@@ -287,17 +287,8 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
       </div>
 
       <div className="relative flex flex-col items-center">
-        <div className="animate-rise-in inline-flex items-center gap-2 rounded-full border border-border bg-panel px-3.5 py-1.5 text-[11px] font-medium text-muted">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gain opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-gain" />
-          </span>
-          Live on LiteForge testnet
-        </div>
-
         <h1
-          className="font-display animate-rise-in mt-8 max-w-4xl text-balance text-[2.6rem] font-normal leading-[1.04] tracking-[-0.02em] sm:text-[4.75rem]"
-          style={{ animationDelay: "70ms" }}
+          className="font-display animate-rise-in max-w-4xl text-balance text-[2.6rem] font-normal leading-[1.04] tracking-[-0.02em] sm:text-[4.75rem]"
         >
           A Forge Guardian for your <span className="text-gradient-ember italic">zkLTC</span> stack.
         </h1>

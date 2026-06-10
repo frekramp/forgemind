@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { Panel } from "./ui/panel";
 import { Button } from "./ui/button";
 import { useKeeper } from "@/hooks/useKeeper";
@@ -22,6 +23,10 @@ type RunResult = { ran: number; actions: { user: string; action: string; txHash:
  *  24/7 (no browser, no per-tx clicks). This is what makes "AI agent" literally true. */
 export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const k = useKeeper();
+  const { isConnected } = useAccount();
+  // The delegation/run buttons can only do something with a wallet AND a keeper agent set on the
+  // vault. Otherwise they'd be clickable but silently no-op - so we disable + explain instead.
+  const canDelegate = isConnected && k.agentConfigured;
   const [compound, setCompound] = useState(true);
   const [rebalance, setRebalance] = useState(true);
   const [durIdx, setDurIdx] = useState(1);
@@ -108,29 +113,30 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
-            disabled={k.busy || (!compound && !rebalance)}
+            disabled={k.busy || (!compound && !rebalance) || !canDelegate}
             onClick={() => v && k.authorize(compound, rebalance, DURATIONS[durIdx].secs).catch(() => {})}
           >
             {k.busy ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
             {k.active ? "Update delegation" : "Delegate to keeper"}
           </Button>
           {k.active && (
-            <Button size="sm" variant="outline" disabled={k.busy} onClick={() => k.revoke().catch(() => {})}>
+            <Button size="sm" variant="outline" disabled={k.busy || !canDelegate} onClick={() => k.revoke().catch(() => {})}>
               <Power size={14} /> Revoke
             </Button>
           )}
-          <Button size="sm" variant="outline" disabled={running} onClick={runKeeper}>
+          <Button size="sm" variant="outline" disabled={running || !canDelegate} onClick={runKeeper}>
             {running ? <Loader2 size={14} className="animate-spin" /> : <Bot size={14} />}
             Run keeper now
           </Button>
         </div>
 
-        {!k.agentConfigured && (
-          <p className="text-[11px] text-dim">
-            No keeper address is set on the vault yet. Deploy with <code className="font-mono text-muted">KEEPER_ADDRESS</code>{" "}
-            (or call <code className="font-mono text-muted">setAgent</code>) and run the keeper with{" "}
-            <code className="font-mono text-muted">KEEPER_PRIVATE_KEY</code>.
-          </p>
+        {!canDelegate && (
+          <div className="flex items-start gap-2 rounded-lg border border-border bg-bg px-3 py-2 text-[11px] leading-relaxed text-dim">
+            <ShieldCheck size={13} className="mt-0.5 shrink-0 text-ember" />
+            {!isConnected
+              ? "Connect a wallet to delegate the keeper. The 'delegated' status above shows how an active grant looks in the demo."
+              : "The autonomous keeper isn't activated on this testnet deployment yet - explore the demo to see a live delegation in action."}
+          </div>
         )}
 
         {run && (

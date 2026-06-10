@@ -113,7 +113,14 @@ function authorized(request: Request): boolean {
 // Single-flight guard: prevents overlapping ticks (cron + manual) from racing nonces.
 let ticking = false;
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Vercel Cron (24/7) calls GET with `Authorization: Bearer <CRON_SECRET>` - run a keeper tick.
+  const secret = process.env.KEEPER_CRON_SECRET || process.env.CRON_SECRET;
+  const provided =
+    request.headers.get("x-keeper-secret") ??
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+    null;
+  if (secret && provided && safeEqual(provided, secret)) return runTick();
   const account = keeperAccount();
   return Response.json({
     configured: isVaultDeployed && !!account,
@@ -132,6 +139,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "unsupported_media_type" }, { status: 415 });
   }
   if (!authorized(request)) return Response.json({ error: "unauthorized" }, { status: 401 });
+  return runTick();
+}
+
+async function runTick(): Promise<Response> {
   const account = keeperAccount();
   if (!isVaultDeployed || !account) {
     return Response.json({ ran: 0, actions: [], note: "keeper not configured (set KEEPER_PRIVATE_KEY)" });

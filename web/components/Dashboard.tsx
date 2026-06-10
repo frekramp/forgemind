@@ -96,7 +96,7 @@ export function Dashboard() {
                       record={al.record}
                       onClaimMission={(id) => missions.claimMission(id).catch(() => {})}
                       onAutoPilot={(strategy, cap) => {
-                        ap.setConfig({ strategy, cap });
+                        ap.setConfig({ strategy, cap, running: false });
                         setTab("autopilot");
                       }}
                       onNavigate={setTab}

@@ -16,16 +16,17 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
       <Panel
         label="Auto-Pilot"
         right={
-          <span className={cn("flex items-center gap-1.5 text-[11px]", enabled ? "text-gain" : "text-dim")}>
-            <span className={cn("h-1.5 w-1.5 rounded-full", enabled ? "bg-gain animate-pulse-ember" : "bg-dim")} />
-            {enabled ? "active" : "idle"}
+          <span className={cn("flex items-center gap-1.5 text-[11px]", enabled ? "text-gain" : config.strategy !== "off" ? "text-ember" : "text-dim")}>
+            <span className={cn("h-1.5 w-1.5 rounded-full", enabled ? "bg-gain animate-pulse-ember" : config.strategy !== "off" ? "bg-ember" : "bg-dim")} />
+            {enabled ? "active" : config.strategy !== "off" ? "paused" : "idle"}
           </span>
         }
       >
         <div className="space-y-4">
           <p className="text-sm leading-relaxed text-muted">
-            The agent runs a rule on a timer and <span className="text-text">acts on-chain automatically</span>. You
-            still confirm each transaction in your wallet. Pick a strategy:
+            The agent runs a rule on a timer and acts on-chain automatically. Pick a strategy, set it up, then{" "}
+            <span className="text-text">press Start</span>. Nothing fires until you do, and you still confirm every
+            transaction in your wallet.
           </p>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 stagger">
@@ -34,21 +35,21 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
               icon={Coins}
               title="Auto-Compound"
               desc="Claim yield once it crosses a threshold."
-              onClick={() => setConfig({ strategy: config.strategy === "compound" ? "off" : "compound" })}
+              onClick={() => setConfig({ strategy: "compound", running: false })}
             />
             <StrategyCard
               active={config.strategy === "dca"}
               icon={Repeat}
               title="Auto-DCA"
               desc="Deposit a fixed amount on a schedule."
-              onClick={() => setConfig({ strategy: config.strategy === "dca" ? "off" : "dca" })}
+              onClick={() => setConfig({ strategy: "dca", running: false })}
             />
             <StrategyCard
               active={config.strategy === "off"}
               icon={Power}
               title="Off"
               desc="Pause all autonomous actions."
-              onClick={() => setConfig({ strategy: "off" })}
+              onClick={() => setConfig({ strategy: "off", running: false })}
             />
           </div>
 
@@ -86,6 +87,24 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
             </div>
           )}
 
+          {config.strategy !== "off" && (
+            <Button
+              onClick={() => setConfig({ running: !config.running })}
+              variant={config.running ? "outline" : "primary"}
+              className="w-full"
+            >
+              {config.running ? (
+                <>
+                  <Power size={15} /> Pause Auto-Pilot
+                </>
+              ) : (
+                <>
+                  <Bot size={15} /> Start Auto-Pilot
+                </>
+              )}
+            </Button>
+          )}
+
           <div className="flex items-start gap-2 rounded-lg border border-border bg-bg px-3 py-2 text-[11px] text-dim">
             <ShieldAlert size={14} className="mt-0.5 shrink-0 text-ember" />
             Honest by design: an injected wallet signs every tx, so the spend cap is a client-side guardrail and each
@@ -98,7 +117,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
         {log.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center">
             <Bot size={20} className="text-dim" />
-            <p className="text-sm text-dim">No autonomous actions yet. Enable a strategy above.</p>
+            <p className="text-sm text-dim">No autonomous actions yet. Configure a strategy and press Start.</p>
           </div>
         ) : (
           <div className="space-y-1">

@@ -10,6 +10,7 @@ import type { AutoPilotStrategy } from "@/lib/agent";
 
 export type PilotConfig = {
   strategy: AutoPilotStrategy; // "compound" | "dca" | "off"
+  running: boolean; // user explicitly pressed Start — picking a strategy alone never arms the loop
   cap: number; // session spend cap (zkLTC) - advisory
   claimThreshold: number; // auto-claim when pendingYield >= this
   dcaAmount: number; // zkLTC per DCA tick
@@ -20,10 +21,11 @@ export type PilotLogEntry = { ts: number; text: string; tx?: string };
 
 const DEFAULT: PilotConfig = {
   strategy: "off",
+  running: false,
   cap: 5,
   claimThreshold: 0.01,
   dcaAmount: 1,
-  dcaIntervalMin: 1,
+  dcaIntervalMin: 5,
 };
 
 const LS_KEY = "forgemind.autopilot";
@@ -97,7 +99,8 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
     [record]
   );
 
-  const enabled = config.strategy !== "off";
+  // The loop only runs when the user has explicitly Started it — selecting a strategy just configures.
+  const enabled = config.running && config.strategy !== "off";
 
   // Latest-value refs so the loop reads current config/state WITHOUT listing them as effect deps.
   // Listing v/config/spent re-created the interval on every render (and fired tick() each time) —

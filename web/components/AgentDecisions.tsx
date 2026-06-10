@@ -90,7 +90,7 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
           <BrainCircuit size={14} className="mt-0.5 shrink-0 text-ember" />
           <span>
             Every move the guardian makes is written on-chain with the engine that decided it
-            (<span className="text-ember">Claude</span> vs. rule-based) and a reason: a verifiable trail of{" "}
+            (<span className="text-ember">Forge Guardian</span> vs. rule-based) and a reason: a verifiable trail of{" "}
             <span className="text-text">why</span>, paired with the vault&apos;s record of <span className="text-text">what</span>.
             Autonomous keeper moves are signed by the agent&apos;s key and{" "}
             <span className="inline-flex items-center gap-0.5 text-gain"><ShieldCheck size={11} /> verified</span> on-chain. Proof, not a claim.

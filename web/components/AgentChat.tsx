@@ -51,7 +51,7 @@ export function AgentChat({
     {
       role: "assistant",
       content:
-        "I'm your ForgeMind Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC. I'll prepare the transaction for you to sign.",
+        "I'm your Forge Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC. I'll prepare the transaction for you to sign.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -165,7 +165,7 @@ export function AgentChat({
 
   return (
     <Panel
-      label="AI Guardian"
+      label="Forge Guardian"
       right={
         <span className="flex items-center gap-1.5 text-[11px] text-dim">
           <span className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse-ember" />

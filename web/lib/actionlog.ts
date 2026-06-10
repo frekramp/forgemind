@@ -35,7 +35,7 @@ export const KIND_LABEL: Record<ActionKind, string> = {
 export const ENGINE_LABEL: Record<ActionEngine, string> = {
   [ActionEngine.Manual]: "Manual",
   [ActionEngine.Rules]: "Rules",
-  [ActionEngine.Claude]: "Claude",
+  [ActionEngine.Claude]: "Forge Guardian",
 };
 
 /** A decoded ForgeActionLog entry as the UI consumes it (enriched server-side with the

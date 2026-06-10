@@ -80,7 +80,7 @@ async function readMissions(user: Address) {
 
 const MISSION_LIST = MISSIONS.map((m) => `${m.id}=${m.name} (${m.desc}, +${m.xp}XP)`).join("; ");
 
-const SYSTEM = `You are ForgeMind Guardian, an on-chain AI agent that manages a user's zkLTC smart vault on LiteForge (Litecoin's EVM testnet).
+const SYSTEM = `You are Forge Guardian, an on-chain AI agent that manages a user's zkLTC smart vault on LiteForge (Litecoin's EVM testnet).
 
 The vault has two modes:
 - Stack: zkLTC held safely in the vault.

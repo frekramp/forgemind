@@ -117,7 +117,7 @@ export function Dashboard() {
  *  viewer (or judge) gets it instantly. */
 function Orientation() {
   const chips = [
-    { Icon: Sparkles, label: "Live Claude agent" },
+    { Icon: Sparkles, label: "Live Forge Guardian" },
     { Icon: Link2, label: "On-chain decisions" },
     { Icon: ShieldCheck, label: "Cryptographically verified" },
   ];
@@ -125,7 +125,7 @@ function Orientation() {
     <div className="card-elev flex flex-col gap-4 rounded-2xl border border-border bg-panel p-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <h2 className="font-display text-[1.4rem] leading-tight tracking-tight">
-          An AI guardian that <span className="text-gradient-ember italic">acts on-chain</span>.
+          A Forge Guardian that <span className="text-gradient-ember italic">acts on-chain</span>.
         </h2>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
           It reads your vault, reasons, and executes real transactions you sign: switch Stack/Grow, set a halving
@@ -256,7 +256,7 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
           className="font-display animate-rise-in mt-8 max-w-4xl text-balance text-[2.6rem] font-normal leading-[1.04] tracking-[-0.02em] sm:text-[4.75rem]"
           style={{ animationDelay: "70ms" }}
         >
-          An AI guardian for your <span className="text-gradient-ember italic">zkLTC</span> stack.
+          A Forge Guardian for your <span className="text-gradient-ember italic">zkLTC</span> stack.
         </h1>
 
         <p

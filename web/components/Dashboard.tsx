@@ -25,7 +25,7 @@ import { AgentDecisions } from "./AgentDecisions";
 import { useDemoMode } from "./DemoProvider";
 import { isVaultDeployed } from "@/lib/contracts";
 import { countdownTo, type Countdown } from "@/lib/halving";
-import { Flame, ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X } from "lucide-react";
+import { Flame, ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2 } from "lucide-react";
 import { useEffect } from "react";
 
 const NEEDS_WALLET: TabKey[] = ["overview", "missions", "autopilot"];
@@ -64,6 +64,7 @@ export function Dashboard() {
     // overview
     return (
       <div className="space-y-5">
+        <Orientation />
         <StatStrip v={v} />
         <AgentInsight v={v} onSwitchMode={(m) => v.setMode(m).catch(() => {})} />
         <VaultPanel v={v} />
@@ -109,6 +110,39 @@ export function Dashboard() {
         )}
       </main>
       <Footer />
+    </div>
+  );
+}
+
+/** Top-of-overview orientation: what ForgeMind is + the three differentiators, so a first-time
+ *  viewer (or judge) gets it instantly. */
+function Orientation() {
+  const chips = [
+    { Icon: Sparkles, label: "Live Claude agent" },
+    { Icon: Link2, label: "On-chain decisions" },
+    { Icon: ShieldCheck, label: "Cryptographically verified" },
+  ];
+  return (
+    <div className="card-elev flex flex-col gap-4 rounded-2xl border border-border bg-panel p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h2 className="font-display text-[1.4rem] leading-tight tracking-tight">
+          An AI guardian that <span className="text-gradient-ember italic">acts on-chain</span>.
+        </h2>
+        <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
+          It reads your vault, reasons, and executes real transactions you sign - switch Stack/Grow, set a halving
+          goal, and every decision is written on-chain.
+        </p>
+      </div>
+      <div className="flex flex-shrink-0 flex-wrap gap-2">
+        {chips.map(({ Icon, label }) => (
+          <span
+            key={label}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-[11px] font-medium text-muted"
+          >
+            <Icon size={12} className="text-ember" /> {label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

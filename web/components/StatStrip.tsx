@@ -1,6 +1,7 @@
 "use client";
 
 import { Mode } from "@/lib/contracts";
+import { cn } from "@/lib/cn";
 import { fmtNum } from "@/lib/format";
 import { useCountUp } from "@/hooks/useCountUp";
 import { daysToHalving } from "@/lib/halving";
@@ -28,7 +29,10 @@ export function StatStrip({ v }: { v: ReturnType<typeof useVault> }) {
       {items.map(({ label, value, unit, Icon, accent }) => (
         <div
           key={label}
-          className="lift rounded-xl border border-border bg-panel p-4 hover:border-border-strong"
+          className={cn(
+            "lift rounded-xl border bg-panel p-4",
+            accent ? "border-ember/45 ring-1 ring-ember/15" : "border-border hover:border-border-strong"
+          )}
         >
           <div className="flex items-center justify-between">
             <span className="label">{label}</span>

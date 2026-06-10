@@ -384,17 +384,7 @@ function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-1 px-5 py-4 text-[11px] text-dim sm:flex-row">
         <span>ForgeMind · AI smart vault for zkLTC</span>
-        <span>
-          Built on LiteForge (LitVM) · chain 4441 · agent ledger deployed via{" "}
-          <a
-            href="https://dappit.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted transition-colors hover:text-ember"
-          >
-            Dappit
-          </a>
-        </span>
+        <span>Built on LiteForge (LitVM) · chain 4441 · gas in zkLTC</span>
       </div>
     </footer>
   );

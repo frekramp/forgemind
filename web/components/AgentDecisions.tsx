@@ -284,7 +284,7 @@ function NotDeployed() {
       <BrainCircuit size={20} className="text-dim" />
       <p className="text-sm text-dim">Decision ledger not configured.</p>
       <p className="max-w-sm text-[11px] text-dim">
-        Deploy <code className="font-mono text-muted">ForgeActionLog</code> (via Dappit or{" "}
+        Deploy <code className="font-mono text-muted">ForgeActionLog</code> (via{" "}
         <code className="font-mono text-muted">forge script</code>) and set{" "}
         <code className="font-mono text-muted">NEXT_PUBLIC_ACTIONLOG_ADDRESS</code>.
       </p>

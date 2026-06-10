@@ -65,7 +65,7 @@ forgemind/
 | `ForgeVault` | Custody, Stack/Grow modes, halving goal, projection, TVL + user registry. `withdrawAll()` exits principal + yield in one tx; `setStrategy` is guarded so a swap can't orphan Grow funds. |
 | `MockYieldStrategy` | Simulated 5% APY from a pre-funded reward pool; partial withdrawals pay a **pro-rata** share of accrued yield. |
 | `ForgeProfile` | On-chain missions, XP/levels, usernames, leaderboard registry. |
-| `ForgeActionLog` | Tamper-evident ledger of agent decisions (Kind + Engine + reason). **Deployed via [Dappit](https://dappit.io)**, the hackathon's autonomous-deploy partner. |
+| `ForgeActionLog` | Tamper-evident ledger of agent decisions (Kind + Engine + reason); attested entries carry a trusted-signer signature verified on-chain in `logAttested`. |
 
 ---
 
@@ -81,9 +81,7 @@ forge script script/Deploy.s.sol:Deploy --rpc-url liteforge --broadcast
 ```
 Get testnet zkLTC from the faucet: **https://liteforge.hub.caldera.xyz**
 
-> **Deploying via Dappit:** `ForgeActionLog.sol` is a single self-contained file - paste it into
-> [Dappit](https://dappit.io) (the hackathon's autonomous-deploy partner), target LiteForge (chain 4441),
-> and deploy. Set the resulting address as `NEXT_PUBLIC_ACTIONLOG_ADDRESS` to light up the **Decisions** tab.
+> Set the deployed `ForgeActionLog` address as `NEXT_PUBLIC_ACTIONLOG_ADDRESS` to light up the **Decisions** tab.
 
 ### 2. Frontend (Next.js)
 ```bash

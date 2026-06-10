@@ -137,7 +137,7 @@ function ShareModal({ onClose }: { onClose: () => void }) {
             href={xHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-ember py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-ember py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             <Share2 size={15} /> Share on X
           </a>

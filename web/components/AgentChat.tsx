@@ -306,7 +306,7 @@ function LiveTrace({ steps, typing }: { steps: TraceStep[]; typing: boolean }) {
               )}
               <div className="min-w-0">
                 <span className="text-muted">{st.label}</span>
-                {st.detail && <span className="ml-1 text-dim">- {st.detail}</span>}
+                {st.detail && <span className="ml-1 text-dim">· {st.detail}</span>}
               </div>
             </div>
           );
@@ -339,7 +339,7 @@ function ReasoningTrace({ steps }: { steps: TraceStep[] }) {
               />
               <div className="min-w-0">
                 <span className="text-muted">{st.label}</span>
-                {st.detail && <span className="ml-1 text-dim">- {st.detail}</span>}
+                {st.detail && <span className="ml-1 text-dim">· {st.detail}</span>}
               </div>
             </div>
           ))}

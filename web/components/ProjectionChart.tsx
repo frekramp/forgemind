@@ -2,7 +2,8 @@
 
 import { fmtNum } from "@/lib/format";
 
-/** Stack (flat) vs Grow (rising) projection to the halving. Pure SVG, draws on mount. */
+/** Stack (flat) vs Grow (rising) projection to the halving. Pure SVG, draws on mount.
+ *  Strokes use Tailwind stroke-* classes (not stroke="" attrs) so they theme via CSS vars. */
 export function ProjectionChart({
   current,
   goal,
@@ -24,9 +25,10 @@ export function ProjectionChart({
   const growArea = `${grow} L 100 ${H} L 0 ${H} Z`;
   const stack = `M 0 ${stackY} L 100 ${stackY}`;
 
-  // Crisp HTML overlay positions (percent of height) - don't distort with the stretched SVG.
-  const growEndPct = (growEndY / H) * 100;
-  const goalPct = (goalY / H) * 100;
+  // Overlay positions (percent of height), clamped so markers never clip at the top/bottom edge.
+  const clampPct = (v: number) => Math.min(96, Math.max(4, (v / H) * 100));
+  const growEndPct = clampPct(growEndY);
+  const goalPct = clampPct(goalY);
 
   return (
     <div className="space-y-3">
@@ -34,7 +36,7 @@ export function ProjectionChart({
         <svg viewBox={`0 0 100 ${H}`} preserveAspectRatio="none" className="h-full w-full">
           <defs>
             <linearGradient id="growfill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ff8a4c" stopOpacity="0.32" />
+              <stop offset="0%" stopColor="#ff8a4c" stopOpacity="0.3" />
               <stop offset="42%" stopColor="#f4632a" stopOpacity="0.1" />
               <stop offset="100%" stopColor="#f4632a" stopOpacity="0" />
             </linearGradient>
@@ -49,7 +51,7 @@ export function ProjectionChart({
 
           {/* gridlines */}
           {[0.25, 0.5, 0.75].map((g) => (
-            <line key={g} x1="0" y1={H * g} x2="100" y2={H * g} stroke="#2e2e38" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
+            <line key={g} x1="0" y1={H * g} x2="100" y2={H * g} className="stroke-border-strong" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
           ))}
 
           {/* grow fill */}
@@ -62,40 +64,39 @@ export function ProjectionChart({
               y1={goalY}
               x2="100"
               y2={goalY}
-              stroke="#cfc8c0"
+              className="stroke-dim"
               strokeWidth="1"
               strokeDasharray="3,2.5"
               vectorEffect="non-scaling-stroke"
             />
           )}
 
-          {/* stack baseline - clearly visible now */}
+          {/* stack baseline */}
           <path
             d={stack}
             fill="none"
-            stroke="#9b9ba6"
+            className="stroke-muted"
             strokeWidth="1.4"
             strokeDasharray="3.5,3"
             vectorEffect="non-scaling-stroke"
           />
 
-          {/* grow curve - bright + glow */}
+          {/* grow curve: bright ember + glow */}
           <path
             d={grow}
             fill="none"
-            stroke="#ff7a45"
+            className="animate-draw stroke-ember-bright"
             strokeWidth="2.5"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
             filter="url(#emberGlow)"
             pathLength={1}
-            className="animate-draw"
           />
         </svg>
 
         {/* glowing endpoint for the grow projection */}
         <span
-          className="absolute right-[3px] h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-ember-bright shadow-[0_0_12px_2px_rgba(244,99,42,0.7)] ring-2 ring-ember/25"
+          className="absolute right-[3px] h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-ember-bright shadow-[0_0_12px_2px_rgba(244,99,42,0.55)] ring-2 ring-ember/25"
           style={{ top: `${growEndPct}%` }}
         />
         {/* goal marker */}
@@ -111,11 +112,11 @@ export function ProjectionChart({
 
       <div className="flex items-center justify-between text-xs">
         <span className="flex items-center gap-1.5 text-muted">
-          <span className="inline-block h-0 w-3.5 border-t-2 border-dashed border-[#9b9ba6] align-middle" /> Stack ·{" "}
+          <span className="inline-block h-0 w-3.5 border-t-2 border-dashed border-dim align-middle" /> Stack ·{" "}
           {fmtNum(current, 2)}
         </span>
         <span className="flex items-center gap-1.5 text-ember">
-          <span className="inline-block h-[3px] w-3.5 rounded-full bg-ember-bright align-middle shadow-[0_0_8px_rgba(244,99,42,0.6)]" />{" "}
+          <span className="inline-block h-[3px] w-3.5 rounded-full bg-ember-bright align-middle shadow-[0_0_8px_rgba(244,99,42,0.5)]" />{" "}
           Grow · {fmtNum(projectedGrow, 2)} by halving
         </span>
       </div>

@@ -367,8 +367,8 @@ async function rulesEngine(
     return {
       text:
         strategy === "dca"
-          ? `Enabling Auto-DCA with a ${cap} zkLTC session cap - I'll deposit on a schedule (you confirm each tx).`
-          : `Enabling Auto-Compound - I'll auto-claim your yield once it builds up (you confirm each tx).`,
+          ? `Enabling Auto-DCA with a ${cap} zkLTC session cap. I'll deposit on a schedule (you confirm each tx).`
+          : `Enabling Auto-Compound. I'll auto-claim your yield once it builds up (you confirm each tx).`,
     };
   }
   // Missions before the generic claim branch - "claim a mission" contains "claim".
@@ -377,7 +377,7 @@ async function rulesEngine(
     if (!m) return { text: "Connect your wallet and open the Missions tab to start earning XP toward the leaderboard." };
     const claimable = m.missions.filter((x) => x.claimable);
     if (claimable.length === 0) {
-      return { text: `You're level ${m.level} with ${m.xp} XP (${m.claimedCount}/${MISSIONS.length} missions). Nothing new to claim - keep stacking.` };
+      return { text: `You're level ${m.level} with ${m.xp} XP (${m.claimedCount}/${MISSIONS.length} missions). Nothing new to claim. Keep stacking.` };
     }
     for (const c of claimable) actions.push({ type: "claimMission", missionId: c.id, label: `Claim "${c.name}"` });
     return { text: `You can claim ${claimable.length} mission${claimable.length > 1 ? "s" : ""}: ${claimable.map((c) => c.name).join(", ")}. Confirm in your wallet.` };
@@ -400,7 +400,7 @@ async function rulesEngine(
   }
   if (/\b(grow|yield|earn|deploy|compound)\b/.test(t) && !/stack/.test(t)) {
     actions.push({ type: "setMode", mode: 1, label: "Switch to Grow mode" });
-    return { text: `Switching you to Grow mode - your zkLTC will earn a simulated ~5% APY toward the halving. Confirm in your wallet.` };
+    return { text: `Switching you to Grow mode. Your zkLTC will earn a simulated ~5% APY toward the halving. Confirm in your wallet.` };
   }
   if (/\b(stack|safe|hold|secure)\b/.test(t) && !s) {
     return { text: "Connect your wallet and deposit zkLTC, then I can audit your stack." };
@@ -408,12 +408,12 @@ async function rulesEngine(
   if (/deposit/.test(t)) {
     const a = num();
     if (a) actions.push({ type: "deposit", amount: a, label: `Deposit ${a} zkLTC` });
-    return { text: a ? `Prepared a deposit of ${a} zkLTC - confirm in your wallet.` : "How much zkLTC would you like to deposit?" };
+    return { text: a ? `Prepared a deposit of ${a} zkLTC. Confirm in your wallet.` : "How much zkLTC would you like to deposit?" };
   }
   if (/withdraw/.test(t)) {
     const a = num();
     if (a) actions.push({ type: "withdraw", amount: a, label: `Withdraw ${a} zkLTC` });
-    return { text: a ? `Prepared a withdrawal of ${a} zkLTC - confirm in your wallet.` : "How much would you like to withdraw?" };
+    return { text: a ? `Prepared a withdrawal of ${a} zkLTC. Confirm in your wallet.` : "How much would you like to withdraw?" };
   }
   if (/goal|target/.test(t)) {
     const a = num();

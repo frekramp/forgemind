@@ -12,10 +12,14 @@ export const metadata: Metadata = {
     "The only AI agent on LitVM that reads your on-chain vault, reasons, acts, and notarizes every decision on-chain. Stack hard money toward the Litecoin halving - on LiteForge.",
 };
 
+// Runs before paint: apply the saved theme so there's no light/dark flash on load.
+const themeInit = `(function(){try{if(localStorage.getItem('forgemind.theme')==='light')document.documentElement.classList.add('light')}catch(e){}})()`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -32,7 +32,7 @@ export function Tabs({ active, onChange }: { active: TabKey; onChange: (t: TabKe
             onClick={() => onChange(key)}
             className={cn(
               "flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all",
-              on ? "bg-panel-2 text-ember shadow-[inset_0_0_0_1px_var(--color-border-strong)]" : "text-dim hover:text-text"
+              on ? "bg-panel-2 text-ember shadow-[inset_0_0_0_1px_rgb(var(--color-border-strong))]" : "text-dim hover:text-text"
             )}
           >
             <Icon size={15} />

@@ -5,6 +5,7 @@ import { Flame } from "lucide-react";
 import { Button } from "./ui/button";
 import { ConnectButton } from "./ConnectButton";
 import { ShareStackButton } from "./ShareStack";
+import { ThemeToggle } from "./ThemeToggle";
 import { liteforge } from "@/lib/chains";
 import { fmtNum, shortAddr, weiToNum } from "@/lib/format";
 
@@ -29,6 +30,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <span className="hidden items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs text-muted sm:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse-ember" />
             LiteForge · testnet

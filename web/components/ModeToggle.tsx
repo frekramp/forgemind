@@ -31,7 +31,7 @@ export function ModeToggle({
               "flex flex-col items-start gap-1 rounded-md px-3 py-2.5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-50",
               active
                 ? cn(
-                    "bg-panel-2 shadow-[inset_0_0_0_1px_var(--color-border-strong)]",
+                    "bg-panel-2 shadow-[inset_0_0_0_1px_rgb(var(--color-border-strong))]",
                     m === Mode.Grow ? "text-ember" : "text-text"
                   )
                 : "text-dim hover:text-muted"

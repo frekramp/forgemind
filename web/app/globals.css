@@ -2,33 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── theme tokens (RGB channels so Tailwind opacity modifiers work) ───────── */
 :root {
   color-scheme: dark;
-  --color-bg: #0b0b0e;
-  --color-panel: #131318;
-  --color-panel-2: #1a1a21;
-  --color-border: #26262e;
-  --color-border-strong: #34343f;
-  --color-text: #e7e7ea;
-  --color-muted: #9a9aa5;
-  --color-dim: #6b6b75;
-  --color-ember: #f4632a;
-  --color-ember-bright: #ff7a45;
-  --color-ember-deep: #c2410c;
-  --color-gain: #34d399;
-  --color-loss: #f43f5e;
+  --color-bg: 11 11 14;
+  --color-panel: 19 19 24;
+  --color-panel-2: 26 26 33;
+  --color-border: 38 38 46;
+  --color-border-strong: 52 52 63;
+  --color-text: 231 231 234;
+  --color-muted: 154 154 165;
+  --color-dim: 107 107 117;
+  --color-ember: 244 99 42;
+  --color-ember-bright: 255 122 69;
+  --color-ember-deep: 194 65 12;
+  --color-gain: 52 211 153;
+  --color-loss: 244 63 94;
+}
+
+:root.light {
+  color-scheme: light;
+  --color-bg: 248 248 251;
+  --color-panel: 255 255 255;
+  --color-panel-2: 242 242 246;
+  --color-border: 228 228 234;
+  --color-border-strong: 208 208 216;
+  --color-text: 24 24 27;
+  --color-muted: 82 82 91;
+  --color-dim: 140 140 150;
+  --color-ember: 234 88 12;
+  --color-ember-bright: 249 115 22;
+  --color-ember-deep: 194 65 12;
+  --color-gain: 21 128 61;
+  --color-loss: 220 38 38;
 }
 
 html,
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
 }
 
 body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* smooth crossfade applied only during a theme switch (avoids slowing hovers) */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease !important;
 }
 
 .tnum {
@@ -41,7 +71,7 @@ body {
   line-height: 1;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-dim);
+  color: rgb(var(--color-dim));
   font-weight: 600;
 }
 
@@ -50,7 +80,7 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a33;
+  background: rgb(var(--color-border-strong));
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-track {
@@ -59,39 +89,40 @@ body {
 
 .glow-ember {
   box-shadow:
-    0 0 0 1px rgba(244, 99, 42, 0.25),
-    0 8px 40px -12px rgba(244, 99, 42, 0.35);
+    0 0 0 1px rgb(var(--color-ember) / 0.25),
+    0 8px 40px -12px rgb(var(--color-ember) / 0.35);
 }
 
 /* gradient mesh backdrop for the hero / app shell */
 .bg-forge {
   background:
-    radial-gradient(60rem 60rem at 85% -10%, rgba(244, 99, 42, 0.07), transparent 60%),
-    radial-gradient(50rem 50rem at -10% 110%, rgba(244, 99, 42, 0.04), transparent 55%),
-    var(--color-bg);
+    radial-gradient(60rem 60rem at 85% -10%, rgb(var(--color-ember) / 0.07), transparent 60%),
+    radial-gradient(50rem 50rem at -10% 110%, rgb(var(--color-ember) / 0.04), transparent 55%),
+    rgb(var(--color-bg));
 }
 
-/* masked hairline grid for hero depth */
+/* masked hairline grid for hero depth (theme-aware via text color) */
 .hero-grid {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgb(var(--color-text) / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--color-text) / 0.045) 1px, transparent 1px);
   background-size: 62px 62px;
   -webkit-mask-image: radial-gradient(46rem 34rem at 50% 32%, #000 10%, transparent 72%);
   mask-image: radial-gradient(46rem 34rem at 50% 32%, #000 10%, transparent 72%);
 }
 
-/* subtle film grain for tactile, non-flat depth (non-interactive) */
+/* subtle film grain for tactile depth (non-interactive) */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 50; /* #14: below modals/toasts so the grain can't cover overlays */
+  z-index: 50;
   pointer-events: none;
   opacity: 0.02;
   mix-blend-mode: soft-light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+:root.light body::after { opacity: 0.015; mix-blend-mode: multiply; }
 
 /* SVG line draw-on for the projection chart */
 @keyframes drawLine {
@@ -107,15 +138,15 @@ body::after {
 
 /* gradient text for accent words */
 .text-gradient-ember {
-  background: linear-gradient(95deg, #ff7a45, #f4632a 55%, #c2410c);
+  background: linear-gradient(95deg, rgb(var(--color-ember-bright)), rgb(var(--color-ember)) 55%, rgb(var(--color-ember-deep)));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* ── motion pass ─────────────────────────────────────────────────────────── */
+/* ── motion ───────────────────────────────────────────────────────────────── */
 
-/* entrance cascade: children of .stagger fade+rise in sequence */
+/* entrance cascade */
 @keyframes fadeRise {
   from { opacity: 0; transform: translateY(9px); }
   to { opacity: 1; transform: translateY(0); }
@@ -130,11 +161,15 @@ body::after {
 .stagger > *:nth-child(7) { animation-delay: 370ms; }
 .stagger > *:nth-child(n + 8) { animation-delay: 425ms; }
 
+/* scroll-reveal: fades+rises when scrolled into view (toggled via IntersectionObserver) */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal.in { opacity: 1; transform: none; }
+
 /* hover lift for cards */
 .lift { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
 .lift:hover { transform: translateY(-2px); }
 
-/* ambient: slow-drifting glow (transform/opacity only - GPU-cheap) */
+/* ambient: slow-drifting glow */
 @keyframes floatGlow {
   0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.85; }
   50% { transform: translate(-50%, -24px) scale(1.06); opacity: 1; }

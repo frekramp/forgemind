@@ -12,7 +12,6 @@ import { VaultPanel } from "./VaultPanel";
 import { HalvingTracker } from "./HalvingTracker";
 import { AgentChat } from "./AgentChat";
 import { ErrorBoundary } from "./ErrorBoundary";
-import { AgentInsight } from "./AgentInsight";
 import { StatStrip } from "./StatStrip";
 import { Tabs, type TabKey } from "./Tabs";
 import { Leaderboard } from "./Leaderboard";
@@ -67,7 +66,6 @@ export function Dashboard() {
       <div className="space-y-5">
         <Orientation />
         <StatStrip v={v} />
-        <AgentInsight v={v} onSwitchMode={(m) => v.setMode(m).catch(() => {})} />
         <VaultPanel v={v} />
         <HalvingTracker v={v} />
       </div>
@@ -265,7 +263,7 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
           className="animate-rise-in mx-auto mt-5 max-w-xl text-balance text-[15px] leading-relaxed text-muted"
           style={{ animationDelay: "130ms" }}
         >
-          Chat with an on-chain agent that executes real transactions - switch modes, set a halving goal, and let it
+          Chat with an on-chain agent that executes real transactions. Switch modes, set a halving goal, and let it
           run your stack <span className="text-text">autonomously</span> toward the next Litecoin halving.
         </p>
 

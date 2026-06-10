@@ -1,10 +1,10 @@
-// Litecoin halving math. The next halving is block 3,360,000 (~early Aug 2027).
+// Litecoin halving math. The next halving is block 3,360,000 (~30 Jul 2027).
 // We mirror the on-chain constant in ForgeVault (HALVING_TIMESTAMP) so the UI and
 // contract agree. The frontend shows a live countdown to this estimate.
-export const HALVING_TIMESTAMP = 1_816_934_400; // seconds (≈ Aug 2027)
+export const HALVING_TIMESTAMP = 1_816_934_400; // seconds (≈ 30 Jul 2027)
 export const HALVING_DATE = new Date(HALVING_TIMESTAMP * 1000);
 // Fixed display label - avoids server/client timezone hydration mismatches.
-export const HALVING_LABEL = "Aug 2027";
+export const HALVING_LABEL = "Jul 2027";
 export const APR_BPS = 500; // 5.00% simulated APR (matches MockYieldStrategy)
 
 export type Countdown = {

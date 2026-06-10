@@ -5,7 +5,7 @@ import { useConnect, useAccount } from "wagmi";
 import { Button, type ButtonProps } from "./ui/button";
 import { liteforge } from "@/lib/chains";
 import { cn } from "@/lib/cn";
-import { Wallet, X, ExternalLink, AlertCircle } from "lucide-react";
+import { Wallet, X, ExternalLink, AlertCircle, Loader2, ChevronRight } from "lucide-react";
 
 /**
  * Robust connect flow:
@@ -26,9 +26,14 @@ export function ConnectButton({
   const { isConnected } = useAccount();
   const { connect, connectors, error, isPending, reset } = useConnect();
   const [open, setOpen] = useState(false);
+  const [connectingId, setConnectingId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+  // Clear the per-wallet spinner if a connection attempt errors (e.g. user rejects).
+  useEffect(() => {
+    if (error) setConnectingId(null);
+  }, [error]);
 
   // De-dupe connectors by name. When EIP-6963 has discovered real wallets
   // (Rabby, MetaMask…), drop the generic "Injected" fallback so the picker shows
@@ -53,8 +58,14 @@ export function ConnectButton({
 
   function doConnect(connector: (typeof connectors)[number]) {
     reset();
+    setConnectingId(connector.uid);
     connect({ connector, chainId: liteforge.id });
+    // Keep the modal open to show the per-wallet connecting state; it unmounts on success.
+  }
+
+  function closeModal() {
     setOpen(false);
+    setConnectingId(null);
   }
 
   function onClick() {
@@ -84,34 +95,81 @@ export function ConnectButton({
       )}
 
       {open && (
-        <>
-          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="fixed left-1/2 top-1/2 z-50 flex max-h-[80vh] w-[320px] -translate-x-1/2 -translate-y-1/2 flex-col rounded-2xl border border-border bg-panel p-4 shadow-2xl">
-            <div className="mb-3 flex shrink-0 items-center justify-between">
-              <span className="text-sm font-semibold">Choose a wallet</span>
-              <button onClick={() => setOpen(false)} className="text-dim hover:text-text">
-                <X size={16} />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={closeModal} />
+          <div className="animate-pop relative flex max-h-[85vh] w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-border-strong bg-panel shadow-[0_24px_80px_-20px_rgba(0,0,0,0.85)]">
+            {/* header */}
+            <div className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-4">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-ember-bright to-ember-deep text-black shadow-[0_2px_16px_-4px_rgba(244,99,42,0.7)]">
+                <Wallet size={17} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-text">Connect a wallet</div>
+                <div className="text-[11px] text-dim">Choose how to connect to LiteForge</div>
+              </div>
+              <button
+                onClick={closeModal}
+                className="grid h-7 w-7 place-items-center rounded-lg text-dim transition-colors hover:bg-panel-2 hover:text-text"
+              >
+                <X size={15} />
               </button>
             </div>
-            <div className="-mr-1 space-y-1.5 overflow-y-auto pr-1">
-              {wallets.map((c) => (
-                <button
-                  key={c.uid}
-                  onClick={() => doConnect(c)}
-                  className="flex w-full items-center gap-3 rounded-lg border border-border bg-bg px-3 py-2.5 text-left text-sm transition-colors hover:border-ember hover:text-ember"
-                >
-                  {c.icon ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.icon} alt="" className="h-5 w-5 rounded" />
-                  ) : (
-                    <Wallet size={18} className="text-dim" />
-                  )}
-                  {c.name}
-                </button>
-              ))}
+
+            {/* wallet list */}
+            <div className="flex flex-col gap-1.5 overflow-y-auto p-3">
+              {wallets.map((c) => {
+                const busy = connectingId === c.uid && isPending;
+                return (
+                  <button
+                    key={c.uid}
+                    onClick={() => doConnect(c)}
+                    disabled={isPending}
+                    className="group flex items-center gap-3 rounded-xl border border-border bg-bg px-3 py-3 text-left transition-all hover:border-ember/50 hover:bg-panel-2 disabled:opacity-60"
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-panel">
+                      {c.icon ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={c.icon} alt="" className="h-9 w-9 object-cover" />
+                      ) : (
+                        <Wallet size={18} className="text-dim" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-text">{c.name}</span>
+                      <span className="block text-[11px] text-dim">
+                        {busy ? "Confirm in your wallet…" : "Detected"}
+                      </span>
+                    </span>
+                    {busy ? (
+                      <Loader2 size={16} className="shrink-0 animate-spin text-ember" />
+                    ) : (
+                      <ChevronRight size={16} className="shrink-0 text-dim transition-colors group-hover:text-ember" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* error + footer */}
+            {error && (
+              <div className="shrink-0 border-t border-border px-5 py-3">
+                <p className="flex items-start gap-1.5 text-xs text-loss">
+                  <AlertCircle size={13} className="mt-0.5 shrink-0" /> {prettyError(error.message)}
+                </p>
+              </div>
+            )}
+            <div className="shrink-0 border-t border-border px-5 py-3 text-center">
+              <a
+                href="https://metamask.io/download/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-dim transition-colors hover:text-ember"
+              >
+                New to wallets? Get MetaMask →
+              </a>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

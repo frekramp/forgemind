@@ -145,6 +145,13 @@ body::after {
 @keyframes growX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .animate-grow-x { transform-origin: left; animation: growX 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+/* modal pop-in */
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-pop { animation: pop 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

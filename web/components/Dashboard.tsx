@@ -130,7 +130,7 @@ function Orientation() {
           An AI guardian that <span className="text-gradient-ember italic">acts on-chain</span>.
         </h2>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
-          It reads your vault, reasons, and executes real transactions you sign - switch Stack/Grow, set a halving
+          It reads your vault, reasons, and executes real transactions you sign: switch Stack/Grow, set a halving
           goal, and every decision is written on-chain.
         </p>
       </div>
@@ -155,7 +155,7 @@ function AutomationIntro() {
     <div className="card-elev rounded-2xl border border-border bg-panel p-5">
       <h2 className="font-display text-[1.3rem] leading-tight tracking-tight">Two ways to automate.</h2>
       <p className="mt-1 text-sm text-muted">
-        Same job - compound yield and rebalance toward your halving goal - at two levels of trust. Pick one below.
+        Compound yield and rebalance toward your halving goal, at two levels of trust. Pick one below.
       </p>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-ember/30 bg-ember-soft p-4">
@@ -334,7 +334,7 @@ function DemoBanner({ onExit }: { onExit: () => void }) {
         Demo
       </span>
       <span className="text-muted">
-        <span className="text-text">Sample data you can play with</span> - deposit, switch modes, set a goal, claim,
+        <span className="text-text">Sample data you can play with</span>: deposit, switch modes, set a goal, claim,
         and chat with the agent. Nothing touches the chain.
       </span>
       <button

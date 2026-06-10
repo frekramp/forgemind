@@ -48,7 +48,7 @@ export function Leaderboard() {
           <span className="text-right">{SORTS.find((s) => s.key === sortBy)?.label}</span>
         </div>
         {isLoading && rows.length === 0 && <Empty text="Reading the registry…" />}
-        {!isLoading && rows.length === 0 && <Empty text="No stackers yet - be the first." />}
+        {!isLoading && rows.length === 0 && <Empty text="No stackers yet. Be the first." />}
         {rows.map((r, i) => {
           const me = address && r.address.toLowerCase() === address.toLowerCase();
           const metric =

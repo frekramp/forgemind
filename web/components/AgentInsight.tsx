@@ -17,7 +17,7 @@ export function AgentInsight({
 }) {
   const s = v.state;
   let tone: "info" | "warn" | "ok" = "info";
-  let msg = "Connect your wallet and deposit zkLTC - I'll help you stack toward the next halving.";
+  let msg = "Connect your wallet and deposit zkLTC. I'll help you stack toward the next halving.";
   let cta: { label: string; run: () => void } | null = null;
 
   if (s) {

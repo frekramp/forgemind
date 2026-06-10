@@ -60,7 +60,7 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
     >
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-muted">
-          Grant the agent an <span className="text-text">on-chain delegation</span> and it runs server-side 24/7 -
+          Grant the agent an <span className="text-text">on-chain delegation</span> and it runs server-side 24/7,
           auto-compounding yield and rebalancing toward your goal with <span className="text-text">no browser open and no
           per-tx clicks</span>. Capped by an expiry, revocable instantly, and it can only ever move your own funds.
         </p>
@@ -135,7 +135,7 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
             <ShieldCheck size={13} className="mt-0.5 shrink-0 text-ember" />
             {!isConnected
               ? "Connect a wallet to delegate the keeper. The 'delegated' status above shows how an active grant looks in the demo."
-              : "The autonomous keeper isn't activated on this testnet deployment yet - explore the demo to see a live delegation in action."}
+              : "The autonomous keeper isn't activated on this testnet deployment yet. Explore the demo to see a live delegation in action."}
           </div>
         )}
 
@@ -168,7 +168,7 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
             Right now the keeper would{" "}
             {v.state.pendingYield >= 0.01
               ? `auto-compound ~${fmtNum(v.state.pendingYield, 4)} zkLTC`
-              : "wait - yield below the 0.01 threshold"}
+              : "wait, yield below the 0.01 threshold"}
             .
           </p>
         )}

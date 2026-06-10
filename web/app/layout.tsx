@@ -14,9 +14,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "ForgeMind - autonomous AI agent for your zkLTC stack on LiteForge",
+  title: "ForgeMind: autonomous AI agent for your zkLTC stack on LiteForge",
   description:
-    "The only AI agent on LitVM that reads your on-chain vault, reasons, acts, and notarizes every decision on-chain. Stack hard money toward the Litecoin halving - on LiteForge.",
+    "The only AI agent on LitVM that reads your on-chain vault, reasons, acts, and notarizes every decision on-chain. Stack hard money toward the Litecoin halving, on LiteForge.",
 };
 
 // Light is the default; only switch to dark if explicitly stored. Runs before paint (no flash).

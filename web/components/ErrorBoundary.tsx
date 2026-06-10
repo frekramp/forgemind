@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<
             <p className="text-sm font-medium text-text">
               Something went wrong{this.props.label ? ` in ${this.props.label}` : ""}.
             </p>
-            <p className="mt-1 text-xs text-muted">This view hit an error - try again or switch tabs.</p>
+            <p className="mt-1 text-xs text-muted">This view hit an error. Try again or switch tabs.</p>
           </div>
           <button
             onClick={() => this.setState({ hasError: false })}

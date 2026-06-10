@@ -55,7 +55,7 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
             <div className="mt-2 text-xs text-muted">
               {isGrow
                 ? `${fmtNum(withdrawable, 2)} principal · ${fmtNum(pending, 4)} yield accruing`
-                : "Held safely - switch to Grow to start compounding."}
+                : "Held safely. Switch to Grow to start compounding."}
             </div>
           </div>
           {isGrow && pending > 0 && (
@@ -76,8 +76,8 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
           <Info size={13} className="mt-0.5 shrink-0 text-ember" />
           <span>
             <span className="text-text">The 5% is simulated</span> on testnet, paid from a pre-funded reward pool (not
-            real revenue). On mainnet the vault plugs into a real yield source - lending interest, LP fees, or liquid
-            staking - through a swappable strategy. Your principal is always custodied <span className="text-text">1:1</span>.
+            real revenue). On mainnet the vault plugs into a real yield source (lending interest, LP fees, or liquid
+            staking) through a swappable strategy. Your principal is always custodied <span className="text-text">1:1</span>.
           </span>
         </div>
 

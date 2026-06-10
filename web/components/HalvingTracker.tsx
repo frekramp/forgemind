@@ -67,7 +67,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
           <div className="flex justify-between gap-3 text-[11px] text-dim">
             {empty ? (
               <span className="text-muted">
-                Vault is empty - deposit zkLTC{goalNum > 0 ? ` to start stacking toward your ${fmtNum(goalNum, goalNum < 1 ? 3 : 0)} goal` : " above to begin"}.
+                Vault is empty. Deposit zkLTC{goalNum > 0 ? ` to start stacking toward your ${fmtNum(goalNum, goalNum < 1 ? 3 : 0)} goal` : " above to begin"}.
               </span>
             ) : (
               <>
@@ -94,7 +94,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
         </div>
         <p className="text-[11px] leading-relaxed text-dim">
           Goal must exceed your current balance. Grow-mode yield is a simulated 5% APY paid from a testnet
-          reward pool - principal is always custodied 1:1.
+          reward pool. Principal is always custodied 1:1.
         </p>
       </div>
     </Panel>

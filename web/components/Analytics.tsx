@@ -40,7 +40,7 @@ export function Analytics() {
           <p>
             ForgeMind is an AI-managed zkLTC vault on LiteForge. Every figure here is read{" "}
             <span className="text-text">live from the contract</span> via{" "}
-            <code className="font-mono text-text">globalStats()</code> - no off-chain database.
+            <code className="font-mono text-text">globalStats()</code>, no off-chain database.
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Mini label="Stack mode" desc="Principal held 1:1, fully custodied and withdrawable anytime." />

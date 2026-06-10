@@ -101,7 +101,7 @@ export function demoDecisions(): DecisionEntry[] {
   });
   return [
     base(ActionKind.AutoCompound, ActionEngine.Rules, 0, "Auto-Compound: yield 0.42 >= 0.10 threshold", 120, "yield", "0.42", mkAtt(3, "0x4a0e086bb8cee9f3daecd52e6fed0d86b5124c34fad3504863c66b3b180410b66153333d78caf4c75645bbd7e95d2256e8f1884a01d5cef83c399b0cf21f15521b")),
-    base(ActionKind.SetMode, ActionEngine.Claude, 0, "Projected short of goal in Stack - Grow clears it", 1080, "mode", undefined, mkAtt(2, "0x67d7aea750eea1ecdd6a730c9ceac9168933a9eb59ab31a2be23ce68066482dd5aced924c743d1a5b896eebd45c534bec1ff0853eea32335b115e712b6f212f71c")),
+    base(ActionKind.SetMode, ActionEngine.Claude, 0, "Projected short of goal in Stack, Grow clears it", 1080, "mode", undefined, mkAtt(2, "0xa7848f5145d3a235b4b2fb0c29bffdaa4fea0f683c443897d4996e46185dca3f507988ad8f12e3ae29c94708e2799ef1bf81fca6ecf5b614c85fb6da8a3c9e131b")),
     base(ActionKind.Deposit, ActionEngine.Claude, 25, "DCA top-up toward the 250 zkLTC halving goal", 3600, "deposit", "25", mkAtt(1, "0x993a7cc6a536a68dac978cd8d39254751b3b36f4f159c53c19a6ec44cac8bab270821f7ca1e92f730968fba6d429c71813d578e33e4746519eefbbbe80cc82ef1b")),
     base(ActionKind.SetGoal, ActionEngine.Claude, 250, "Set halving goal to 250 zkLTC", 10_800, "goal", "250", mkAtt(0, "0x62ecdee8174eb9a4dd56b24464b69918b741aad366cc8659693ccf03d7586a1f79ab70b4b34461efe8ac0dccd74e475b8e60c9fe4f799ed1e6c9f175aa9c7dc61b")),
     base(ActionKind.Deposit, ActionEngine.Manual, 100, "Initial deposit", 172_800, "deposit", "100"),

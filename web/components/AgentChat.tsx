@@ -51,7 +51,7 @@ export function AgentChat({
     {
       role: "assistant",
       content:
-        "I'm your ForgeMind Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC - I'll prepare the transaction for you to sign.",
+        "I'm your ForgeMind Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC. I'll prepare the transaction for you to sign.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -99,14 +99,14 @@ export function AgentChat({
       await playReveal(data);
     } catch {
       setBusy(false);
-      setMessages((m) => [...m, { role: "assistant", content: "I couldn't reach the agent - try again." }]);
+      setMessages((m) => [...m, { role: "assistant", content: "I couldn't reach the agent. Try again." }]);
     }
   }
 
   // Reveal the response progressively: cascade the reasoning steps, then type the answer.
   async function playReveal(data: { text?: string; actions?: AgentAction[]; trace?: TraceStep[] }) {
     const steps = data.trace ?? [];
-    const full = data.text ?? "Done - check the dashboard.";
+    const full = data.text ?? "Done. Check the dashboard.";
     setReveal({ steps: [], text: "" });
     for (let i = 0; i < steps.length; i++) {
       await sleep(steps[i].kind === "read" ? 380 : 260);

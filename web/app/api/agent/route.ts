@@ -93,7 +93,7 @@ Missions (id=name): ${MISSION_LIST}.
 Auto-Pilot runs autonomously on a timer and acts on-chain (the user still confirms each tx): "compound" auto-claims yield past a threshold; "dca" deposits a fixed amount on a schedule with a session spend cap.
 
 Rules:
-- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections - never guess numbers. Call getMissions before discussing missions/XP.
+- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections. Never guess numbers. Call getMissions before discussing missions/XP.
 - To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet - you never move funds yourself. After proposing, tell the user to confirm.
 - Only propose claiming a mission that getMissions shows as met and not already done.
 - Be concise, sharp, and friendly. Use real numbers. 2-4 sentences. zkLTC amounts to ~2 decimals.
@@ -321,7 +321,7 @@ export async function POST(request: Request) {
         stopWhen: stepCountIs(6),
       });
       // Strip em/en-dashes from the live model output (a common "AI" tell) before returning.
-      const text = (result.text?.trim() || "Done - check the dashboard.").replace(/[—–]/g, "-");
+      const text = (result.text?.trim() || "Done. Check the dashboard.").replace(/[—–]/g, "-");
       return Response.json({ text, actions, trace: traceFromSteps(result.steps), engine: "claude" });
     } catch (err) {
       console.error("LLM agent error, falling back to rules:", err);
@@ -383,7 +383,7 @@ async function rulesEngine(
     return { text: `You can claim ${claimable.length} mission${claimable.length > 1 ? "s" : ""}: ${claimable.map((c) => c.name).join(", ")}. Confirm in your wallet.` };
   }
   if (/leaderboard|rank|standing|top stacker/.test(t)) {
-    return { text: "Open the Leaderboard tab - you're ranked against every stacker by XP, balance, goal progress, and yield." };
+    return { text: "Open the Leaderboard tab. You're ranked against every stacker by XP, balance, goal progress, and yield." };
   }
   // Claim (yield) must be checked before the Grow branch - "claim my yield" contains "yield".
   if (/\bclaim\b/.test(t)) {
@@ -396,7 +396,7 @@ async function rulesEngine(
   // even before a wallet is connected (the "connect wallet" fallback is below).
   if (/\bstack\b/.test(t) && /(switch|move|go|put|set|into?)\b/.test(t)) {
     actions.push({ type: "setMode", mode: 0, label: "Switch to Stack mode" });
-    return { text: "Moving you to Stack mode - funds held safely in the vault. Confirm in your wallet." };
+    return { text: "Moving you to Stack mode. Funds held safely in the vault. Confirm in your wallet." };
   }
   if (/\b(grow|yield|earn|deploy|compound)\b/.test(t) && !/stack/.test(t)) {
     actions.push({ type: "setMode", mode: 1, label: "Switch to Grow mode" });
@@ -429,7 +429,7 @@ async function rulesEngine(
       text: `You're in ${s.mode === "grow" ? "Grow" : "Stack"} mode with ${money(s.total)} zkLTC. ${
         s.mode === "grow"
           ? `Risk: low-moderate (principal custodied 1:1, ~${money(s.pendingYield)} zkLTC simulated yield accrued).`
-          : "Risk: minimal - funds are held safely, earning nothing. Switch to Grow to start compounding."
+          : "Risk: minimal. Funds are held safely, earning nothing. Switch to Grow to start compounding."
       }`,
     };
   }
@@ -440,7 +440,7 @@ async function rulesEngine(
     return {
       text: `At your current ${s.mode} pace you'd reach ~${money(s.projected)} zkLTC by the halving vs your ${money(
         s.goal
-      )} goal - ${reached ? "on pace ✅." : `short by ~${money(s.goal - s.projected)}. Switching to Grow would help.`}`,
+      )} goal. ${reached ? "On pace ✅." : `Short by ~${money(s.goal - s.projected)}. Switching to Grow would help.`}`,
     };
   }
   if (/halving|countdown|when/.test(t)) {

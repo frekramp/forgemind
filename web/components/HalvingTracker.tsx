@@ -29,6 +29,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
   const goalNum = s?.goal ?? 0;
   const progress = goalNum > 0 ? pct(current, goalNum) : 0;
   const projectedGrow = projectStack(current, true);
+  const empty = current === 0;
   const currentAnim = useCountUp(current);
 
   const units: [string, number][] = [
@@ -63,9 +64,17 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <div className="flex justify-between text-[11px] text-dim">
-            <span>{progress.toFixed(0)}% complete</span>
-            <span>Projected (Grow): {fmtNum(projectedGrow, 2)}</span>
+          <div className="flex justify-between gap-3 text-[11px] text-dim">
+            {empty ? (
+              <span className="text-muted">
+                Vault is empty - deposit zkLTC{goalNum > 0 ? ` to start stacking toward your ${fmtNum(goalNum, goalNum < 1 ? 3 : 0)} goal` : " above to begin"}.
+              </span>
+            ) : (
+              <>
+                <span>{progress.toFixed(0)}% complete</span>
+                <span>Projected (Grow): {fmtNum(projectedGrow, 2)}</span>
+              </>
+            )}
           </div>
         </div>
 

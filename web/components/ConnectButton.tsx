@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useConnect, useAccount } from "wagmi";
 import { Button, type ButtonProps } from "./ui/button";
 import { liteforge } from "@/lib/chains";
@@ -94,8 +95,9 @@ export function ConnectButton({
         </p>
       )}
 
-      {open && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      {open && mounted &&
+        createPortal(
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={closeModal} />
           <div className="animate-pop relative flex max-h-[85vh] w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-border-strong bg-panel shadow-[0_24px_80px_-20px_rgba(0,0,0,0.85)]">
             {/* header */}
@@ -169,7 +171,8 @@ export function ConnectButton({
               </a>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

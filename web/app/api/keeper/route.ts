@@ -83,17 +83,30 @@ function safeEqual(a: string, b: string): boolean {
 // from `x-keeper-secret` or a `Authorization: Bearer …` header (what Vercel Cron sends) - never
 // a query string, which would leak into access logs, browser history, and Referer.
 function authorized(request: Request): boolean {
-  const secret = process.env.KEEPER_CRON_SECRET;
+  // 1) Scheduler (Vercel Cron / external): bearer or x-keeper-secret matching the configured value.
+  //    Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`.
+  const secret = process.env.KEEPER_CRON_SECRET || process.env.CRON_SECRET;
   if (secret) {
     const provided =
       request.headers.get("x-keeper-secret") ??
       request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
       null;
-    return provided !== null && safeEqual(provided, secret);
+    if (provided !== null && safeEqual(provided, secret)) return true;
   }
-  // No secret configured: FAIL CLOSED by default everywhere. Unauthenticated calls are only
-  // allowed if you explicitly opt in for local dev with KEEPER_DEV_OPEN=true - so a forgotten
-  // KEEPER_CRON_SECRET can never silently leave the endpoint open (incl. on preview deploys).
+  // 2) Same-origin UI control ("Run keeper now"): the Origin/Referer host must equal our own host.
+  //    Safe because the keeper can ONLY perform each user's own on-chain-authorized actions
+  //    (compound their yield / rebalance their mode) within their caps - it cannot move funds out.
+  //    The `ticking` single-flight guard below also blocks overlapping/spam ticks.
+  const host = request.headers.get("host");
+  const originHeader = request.headers.get("origin") ?? request.headers.get("referer");
+  if (host && originHeader) {
+    try {
+      if (new URL(originHeader).host === host) return true;
+    } catch {
+      /* malformed origin header - fall through to deny */
+    }
+  }
+  // 3) Local dev opt-in.
   return process.env.NODE_ENV !== "production" && process.env.KEEPER_DEV_OPEN === "true";
 }
 

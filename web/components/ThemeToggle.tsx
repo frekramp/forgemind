@@ -3,42 +3,41 @@
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 
-/** Light/dark toggle. Flips the `light` class on <html> (CSS vars do the rest), persists the
- *  choice, and adds a brief `.theme-transition` so colors crossfade instead of snapping. */
+/** Light/dark toggle. Light is the default; flips the `dark` class on <html> (CSS vars do the
+ *  rest), persists the choice, and adds a brief `.theme-transition` so colors crossfade. */
 export function ThemeToggle() {
-  const [light, setLight] = useState(false);
+  const [dark, setDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setLight(document.documentElement.classList.contains("light"));
+    setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
   function toggle() {
     const root = document.documentElement;
     root.classList.add("theme-transition");
-    const next = !root.classList.contains("light");
-    root.classList.toggle("light", next);
+    const next = !root.classList.contains("dark");
+    root.classList.toggle("dark", next);
     try {
-      localStorage.setItem("forgemind.theme", next ? "light" : "dark");
+      localStorage.setItem("forgemind.theme", next ? "dark" : "light");
     } catch {
       /* ignore */
     }
-    setLight(next);
-    window.setTimeout(() => root.classList.remove("theme-transition"), 420);
+    setDark(next);
+    window.setTimeout(() => root.classList.remove("theme-transition"), 450);
   }
 
-  // Static placeholder pre-mount to avoid a hydration mismatch on the icon.
-  if (!mounted) return <span className="h-8 w-8" aria-hidden />;
+  if (!mounted) return <span className="h-9 w-9" aria-hidden />;
 
   return (
     <button
       onClick={toggle}
-      title={light ? "Switch to dark" : "Switch to light"}
+      title={dark ? "Switch to light" : "Switch to dark"}
       aria-label="Toggle light or dark theme"
-      className="grid h-8 w-8 place-items-center rounded-lg border border-border text-muted transition-colors hover:border-ember hover:text-ember"
+      className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted transition-colors hover:border-ember hover:text-ember"
     >
-      {light ? <Moon size={15} /> : <Sun size={15} />}
+      {dark ? <Sun size={15} /> : <Moon size={15} />}
     </button>
   );
 }

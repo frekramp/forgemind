@@ -187,10 +187,10 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
         </div>
 
         <h1
-          className="animate-rise-in mt-7 max-w-3xl text-balance text-5xl font-semibold leading-[1.04] tracking-tight sm:text-[3.5rem]"
+          className="font-display animate-rise-in mt-8 max-w-4xl text-balance text-[2.6rem] font-normal leading-[1.04] tracking-[-0.02em] sm:text-[4.75rem]"
           style={{ animationDelay: "70ms" }}
         >
-          An AI guardian for your <span className="text-gradient-ember">zkLTC</span> stack.
+          An AI guardian for your <span className="text-gradient-ember italic">zkLTC</span> stack.
         </h1>
 
         <p
@@ -223,11 +223,11 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
 
         {/* feature strip - a single unified band, not three floating cards */}
         <div
-          className="animate-rise-in mt-14 grid w-full max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3"
+          className="animate-rise-in mt-16 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3"
           style={{ animationDelay: "320ms" }}
         >
           {features.map((f) => (
-            <div key={f.title} className="group bg-panel p-5 text-left transition-colors hover:bg-panel-2">
+            <div key={f.title} className="lift card-elev group rounded-2xl border border-border bg-panel p-6 text-left hover:border-ember/40">
               <div className="flex items-center justify-between">
                 <span className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-bg text-ember transition-colors group-hover:border-ember/40">
                   <f.icon size={15} />

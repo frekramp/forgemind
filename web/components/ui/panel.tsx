@@ -15,14 +15,14 @@ export function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className={cn("rounded-xl border border-border bg-panel", className)}>
+    <section className={cn("card-elev rounded-2xl border border-border bg-panel", className)}>
       {(label || right) && (
-        <header className="flex items-center justify-between border-b border-border px-5 py-3.5">
+        <header className="flex items-center justify-between border-b border-border px-6 py-4">
           {label ? <span className="label">{label}</span> : <span />}
           {right}
         </header>
       )}
-      <div className={cn("p-5", bodyClassName)}>{children}</div>
+      <div className={cn("p-6", bodyClassName)}>{children}</div>
     </section>
   );
 }

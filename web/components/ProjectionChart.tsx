@@ -104,7 +104,7 @@ export function ProjectionChart({
             className="absolute left-[3px] -translate-y-1/2 rounded bg-panel-2 px-1.5 py-0.5 text-[9px] font-semibold tracking-wide text-muted ring-1 ring-border"
             style={{ top: `${goalPct}%` }}
           >
-            GOAL {fmtNum(goal, 0)}
+            GOAL {fmtNum(goal, goal < 1 ? 3 : 0)}
           </span>
         )}
       </div>

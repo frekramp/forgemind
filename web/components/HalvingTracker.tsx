@@ -75,7 +75,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
           <input
             inputMode="decimal"
             value={goal}
-            placeholder={goalNum > 0 ? `current goal ${fmtNum(goalNum, 0)}` : "Set goal e.g. 500"}
+            placeholder={goalNum > 0 ? `current goal ${fmtNum(goalNum, goalNum < 1 ? 3 : 0)}` : "Set goal e.g. 500"}
             onChange={(e) => setGoal(e.target.value.replace(/[^0-9.]/g, ""))}
             className="tnum h-10 flex-1 rounded-lg border border-border bg-bg px-3 font-mono text-sm outline-none transition-colors focus:border-ember placeholder:text-dim"
           />

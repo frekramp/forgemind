@@ -99,67 +99,85 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
 
   const enabled = config.strategy !== "off";
 
-  // the autonomous loop
+  // Latest-value refs so the loop reads current config/state WITHOUT listing them as effect deps.
+  // Listing v/config/spent re-created the interval on every render (and fired tick() each time) —
+  // that, plus guards only set on success, was the tx-spam bug.
+  const cfgRef = useRef(config);
+  const vRef = useRef(v);
+  const spentRef = useRef(spent);
+  const setConfigRef = useRef(setConfig);
+  cfgRef.current = config;
+  vRef.current = v;
+  spentRef.current = spent;
+  setConfigRef.current = setConfig;
+
+  // The autonomous loop — created once per enable/disable. Guardrails against wallet-spam:
+  // single in-flight tx, a 30s cooldown that starts BEFORE the prompt (so a rejected/failed tx
+  // can't immediately re-prompt), and a per-DCA interval that's also armed before the prompt.
   useEffect(() => {
     if (!enabled) return;
+    // Don't deposit the instant DCA is switched on — start the schedule from now.
+    if (cfgRef.current.strategy === "dca" && lastDcaAt.current === 0) lastDcaAt.current = Date.now();
+
     const tick = async () => {
       if (inFlight.current) return;
-      if (!v.isConnected) return;
+      const vv = vRef.current;
+      const cfg = cfgRef.current;
+      const sp = spentRef.current;
+      if (!vv.isConnected || !vv.state) return;
       if (Date.now() - lastActionAt.current < COOLDOWN_MS) return;
-      const s = v.state;
-      if (!s) return;
+      const s = vv.state;
 
-      try {
-        // Rule 1: compound - claim accrued yield once it crosses the threshold (Grow only)
-        if (config.strategy === "compound" && s.mode === Mode.Grow && s.pendingYield >= config.claimThreshold) {
-          inFlight.current = true;
+      // Rule 1: compound — claim accrued yield once it crosses the threshold (Grow only).
+      if (cfg.strategy === "compound" && s.mode === Mode.Grow && s.pendingYield >= cfg.claimThreshold) {
+        inFlight.current = true;
+        lastActionAt.current = Date.now(); // cooldown starts now — even if the user rejects
+        try {
           pushLog(`Auto-claiming ${s.pendingYield.toFixed(4)} zkLTC yield…`);
-          const tx = await v.claimYield();
-          lastActionAt.current = Date.now();
-          pushLog(`Claimed yield`, tx);
-          await notarize(
-            ActionKind.AutoCompound,
-            0n,
-            `Auto-Compound: yield ${s.pendingYield.toFixed(4)} >= ${config.claimThreshold} threshold`
-          );
+          const tx = await vv.claimYield();
+          pushLog("Claimed yield", tx);
+          await notarize(ActionKind.AutoCompound, 0n, `Auto-Compound: yield ${s.pendingYield.toFixed(4)} >= ${cfg.claimThreshold} threshold`);
+        } catch {
+          pushLog("Auto-Compound cancelled or failed.");
+        } finally {
+          inFlight.current = false;
+        }
+        return;
+      }
+
+      // Rule 2: DCA — recurring deposit on a schedule, under the spend cap.
+      if (cfg.strategy === "dca") {
+        if (Date.now() - lastDcaAt.current < cfg.dcaIntervalMin * 60_000) return; // not due yet
+        if (sp + cfg.dcaAmount > cfg.cap) {
+          pushLog(`DCA paused: session cap (${cfg.cap} zkLTC) reached.`);
+          setConfigRef.current({ strategy: "off" });
           return;
         }
-        // Rule 2: DCA - recurring deposit on a schedule, under the spend cap
-        if (config.strategy === "dca") {
-          const due = Date.now() - lastDcaAt.current >= config.dcaIntervalMin * 60_000;
-          const underCap = spent + config.dcaAmount <= config.cap;
-          if (due && underCap && v.walletBalance >= config.dcaAmount) {
-            inFlight.current = true;
-            pushLog(`DCA: depositing ${config.dcaAmount} zkLTC…`);
-            const tx = await v.deposit(String(config.dcaAmount));
-            lastDcaAt.current = Date.now();
-            lastActionAt.current = Date.now();
-            setSpent((p) => {
-              const np = p + config.dcaAmount;
-              persist(config, np);
-              return np;
-            });
-            pushLog(`Deposited ${config.dcaAmount} zkLTC`, tx);
-            await notarize(
-              ActionKind.AutoDCA,
-              toWei(String(config.dcaAmount)),
-              `Auto-DCA: ${config.dcaAmount} zkLTC deposit (session cap ${config.cap})`
-            );
-          } else if (due && !underCap) {
-            pushLog(`DCA paused - session cap (${config.cap} zkLTC) reached.`);
-            setConfig({ strategy: "off" });
-          }
+        if (vv.walletBalance < cfg.dcaAmount) return;
+        inFlight.current = true;
+        lastActionAt.current = Date.now();
+        lastDcaAt.current = Date.now(); // arm the next interval BEFORE the prompt, so a reject can't re-fire
+        try {
+          pushLog(`DCA: depositing ${cfg.dcaAmount} zkLTC…`);
+          const tx = await vv.deposit(String(cfg.dcaAmount));
+          setSpent((p) => {
+            const np = p + cfg.dcaAmount;
+            persist(cfg, np);
+            return np;
+          });
+          pushLog(`Deposited ${cfg.dcaAmount} zkLTC`, tx);
+          await notarize(ActionKind.AutoDCA, toWei(String(cfg.dcaAmount)), `Auto-DCA: ${cfg.dcaAmount} zkLTC deposit (session cap ${cfg.cap})`);
+        } catch {
+          pushLog("DCA deposit cancelled or failed.");
+        } finally {
+          inFlight.current = false;
         }
-      } catch {
-        pushLog("Action cancelled or failed.");
-      } finally {
-        inFlight.current = false;
       }
     };
+
     const id = setInterval(tick, TICK_MS);
-    tick();
     return () => clearInterval(id);
-  }, [enabled, config, spent, v, pushLog, persist, setConfig, notarize]);
+  }, [enabled, pushLog, notarize, persist]);
 
   const resetSpent = useCallback(() => {
     setSpent(0);

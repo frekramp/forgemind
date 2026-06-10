@@ -10,7 +10,7 @@ export type AgentAction =
   | { type: "claimMission"; missionId: number; label: string }
   | { type: "enableAutoPilot"; strategy: AutoPilotStrategy; cap: string; label: string };
 
-/** One step of the agent's reasoning — a tool it called, surfaced to the UI so the
+/** One step of the agent's reasoning - a tool it called, surfaced to the UI so the
  *  multi-step tool use is visible rather than hidden behind the final answer. */
 export type TraceStep = {
   kind: "read" | "prepare"; // read = inspected on-chain state; prepare = staged a tx

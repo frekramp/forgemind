@@ -105,7 +105,7 @@ export function useActionLog() {
 
   /**
    * Notarize an agent decision on-chain. No-op (returns undefined) when the contract
-   * isn't deployed or notarizing is disabled — callers never need to branch.
+   * isn't deployed or notarizing is disabled - callers never need to branch.
    */
   const record = useCallback(
     async (kind: ActionKind, engine: ActionEngine, amountWei: bigint, reason: string) => {

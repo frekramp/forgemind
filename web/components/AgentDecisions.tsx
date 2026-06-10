@@ -90,10 +90,10 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
           <BrainCircuit size={14} className="mt-0.5 shrink-0 text-ember" />
           <span>
             Every move the guardian makes is written on-chain with the engine that decided it
-            (<span className="text-ember">Claude</span> vs. rule-based) and a reason — a verifiable trail of{" "}
+            (<span className="text-ember">Claude</span> vs. rule-based) and a reason - a verifiable trail of{" "}
             <span className="text-text">why</span>, paired with the vault&apos;s record of <span className="text-text">what</span>.
             Autonomous keeper moves are signed by the agent&apos;s key and{" "}
-            <span className="inline-flex items-center gap-0.5 text-gain"><ShieldCheck size={11} /> verified</span> on-chain — proof, not a claim.
+            <span className="inline-flex items-center gap-0.5 text-gain"><ShieldCheck size={11} /> verified</span> on-chain - proof, not a claim.
           </span>
         </div>
 
@@ -103,7 +103,7 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
           <div className="space-y-1 stagger">
             {isLoading && entries.length === 0 && <Empty text="Reading the on-chain decision ledger…" />}
             {!isLoading && entries.length === 0 && (
-              <Empty text="No agent decisions yet — ask the guardian to act, then confirm." />
+              <Empty text="No agent decisions yet - ask the guardian to act, then confirm." />
             )}
             {entries.map((e, i) => (
               <Row key={`${e.timestamp}-${e.actor}-${i}`} e={e} />
@@ -143,7 +143,7 @@ function Row({ e }: { e: DecisionEntry }) {
             <button
               type="button"
               onClick={() => setShowVerify((v) => !v)}
-              title="Cryptographically verified — signed by the agent's trusted key, checked in logAttested(). Click to verify it yourself."
+              title="Cryptographically verified - signed by the agent's trusted key, checked in logAttested(). Click to verify it yourself."
               className="flex shrink-0 items-center gap-1 rounded-md border border-gain/40 bg-gain/5 px-1.5 py-0.5 text-[10px] font-medium text-gain transition-all hover:bg-gain/15 hover:shadow-[0_0_10px_-1px_rgba(52,211,153,0.55)]"
             >
               <ShieldCheck size={10} /> Verified
@@ -268,7 +268,7 @@ function VerifyPanel({ e }: { e: DecisionEntry }) {
           <div className="text-dim">recovered signer (client-side ecrecover)</div>
           <div className="break-all font-mono text-text">{st.recovered}</div>
           <div className="flex items-start gap-1.5 text-gain">
-            <ShieldCheck size={12} className="mt-px shrink-0" /> matches the ForgeMind agent key — proven in your
+            <ShieldCheck size={12} className="mt-px shrink-0" /> matches the ForgeMind agent key - proven in your
             browser, no server, no trust required.
           </div>
         </div>

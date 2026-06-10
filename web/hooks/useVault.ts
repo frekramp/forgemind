@@ -89,7 +89,7 @@ export function useVault() {
           args,
           value,
           // #12: dynamic functionName precludes wagmi's typed inference; `as never` bypasses the
-          // overload check. Behavior is correct — args are built per call site below.
+          // overload check. Behavior is correct - args are built per call site below.
         } as never);
         setHash(h);
         return h;
@@ -107,7 +107,7 @@ export function useVault() {
   }, []);
 
   // ⚠️ #4: every hook above this line runs unconditionally on every render (rules-of-hooks
-  // compliant). The early returns below are render-time branches — do NOT add hooks past here.
+  // compliant). The early returns below are render-time branches - do NOT add hooks past here.
   if (isDemo) {
     return {
       address: DEMO_ADDRESS,

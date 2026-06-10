@@ -29,7 +29,7 @@ type Item = {
 let cache: { at: number; items: Item[] } | null = null;
 const TTL_MS = 20_000;
 
-/** getLogs with adaptive bisection — halves the range on "range too large"/"too many results". */
+/** getLogs with adaptive bisection - halves the range on "range too large"/"too many results". */
 async function getLogsChunked(fromBlock: bigint, toBlock: bigint, depth = 0): Promise<Item[]> {
   try {
     const logs = await client.getLogs({

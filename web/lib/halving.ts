@@ -3,7 +3,7 @@
 // contract agree. The frontend shows a live countdown to this estimate.
 export const HALVING_TIMESTAMP = 1_816_934_400; // seconds (≈ Aug 2027)
 export const HALVING_DATE = new Date(HALVING_TIMESTAMP * 1000);
-// Fixed display label — avoids server/client timezone hydration mismatches.
+// Fixed display label - avoids server/client timezone hydration mismatches.
 export const HALVING_LABEL = "Aug 2027";
 export const APR_BPS = 500; // 5.00% simulated APR (matches MockYieldStrategy)
 

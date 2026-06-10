@@ -10,7 +10,7 @@ import { rateLimit, clientIp, originAllowed } from "@/lib/ratelimit";
 
 export const maxDuration = 30;
 
-// Public, unauthenticated endpoint that drives a paid LLM — guard it against cost-abuse.
+// Public, unauthenticated endpoint that drives a paid LLM - guard it against cost-abuse.
 const AGENT_RATE_LIMIT = 20; // requests
 const AGENT_RATE_WINDOW_MS = 60_000; // per minute, per IP
 
@@ -93,8 +93,8 @@ Missions (id=name): ${MISSION_LIST}.
 Auto-Pilot runs autonomously on a timer and acts on-chain (the user still confirms each tx): "compound" auto-claims yield past a threshold; "dca" deposits a fixed amount on a schedule with a session spend cap.
 
 Rules:
-- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections — never guess numbers. Call getMissions before discussing missions/XP.
-- To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet — you never move funds yourself. After proposing, tell the user to confirm.
+- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections - never guess numbers. Call getMissions before discussing missions/XP.
+- To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet - you never move funds yourself. After proposing, tell the user to confirm.
 - Only propose claiming a mission that getMissions shows as met and not already done.
 - Be concise, sharp, and friendly. Use real numbers. 2-4 sentences. zkLTC amounts to ~2 decimals.
 - A goal must exceed the user's current balance.`;
@@ -246,7 +246,7 @@ function clampNum(v: unknown): number {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
-// Validate/clamp a client-supplied stateOverride (demo mode) — never trust it raw.
+// Validate/clamp a client-supplied stateOverride (demo mode) - never trust it raw.
 function sanitizeState(x: unknown): State | null {
   if (!x || typeof x !== "object") return null;
   const o = x as Record<string, unknown>;
@@ -320,7 +320,8 @@ export async function POST(request: Request) {
         tools: buildTools(getState, user, actions),
         stopWhen: stepCountIs(6),
       });
-      const text = result.text?.trim() || "Done — check the dashboard.";
+      // Strip em/en-dashes from the live model output (a common "AI" tell) before returning.
+      const text = (result.text?.trim() || "Done - check the dashboard.").replace(/[—–]/g, "-");
       return Response.json({ text, actions, trace: traceFromSteps(result.steps), engine: "claude" });
     } catch (err) {
       console.error("LLM agent error, falling back to rules:", err);
@@ -355,7 +356,7 @@ async function rulesEngine(
   };
   const money = (n?: number) => (n ?? 0).toFixed(2);
 
-  // Auto-Pilot first — "auto-compound"/"auto-dca" contain "compound"/"deposit"/"claim"
+  // Auto-Pilot first - "auto-compound"/"auto-dca" contain "compound"/"deposit"/"claim"
   // keywords that later branches would otherwise capture.
   if (/auto.?pilot|automate|auto.?compound|auto.?dca|\bdca\b|recurring|every day|each day/.test(t)) {
     const dca = /dca|recurring|every|each|schedule/.test(t);
@@ -366,25 +367,25 @@ async function rulesEngine(
     return {
       text:
         strategy === "dca"
-          ? `Enabling Auto-DCA with a ${cap} zkLTC session cap — I'll deposit on a schedule (you confirm each tx).`
-          : `Enabling Auto-Compound — I'll auto-claim your yield once it builds up (you confirm each tx).`,
+          ? `Enabling Auto-DCA with a ${cap} zkLTC session cap - I'll deposit on a schedule (you confirm each tx).`
+          : `Enabling Auto-Compound - I'll auto-claim your yield once it builds up (you confirm each tx).`,
     };
   }
-  // Missions before the generic claim branch — "claim a mission" contains "claim".
+  // Missions before the generic claim branch - "claim a mission" contains "claim".
   if (/mission|quest|\bxp\b|badge|achievement|level/.test(t)) {
     const m = await readMissions(user);
     if (!m) return { text: "Connect your wallet and open the Missions tab to start earning XP toward the leaderboard." };
     const claimable = m.missions.filter((x) => x.claimable);
     if (claimable.length === 0) {
-      return { text: `You're level ${m.level} with ${m.xp} XP (${m.claimedCount}/${MISSIONS.length} missions). Nothing new to claim — keep stacking.` };
+      return { text: `You're level ${m.level} with ${m.xp} XP (${m.claimedCount}/${MISSIONS.length} missions). Nothing new to claim - keep stacking.` };
     }
     for (const c of claimable) actions.push({ type: "claimMission", missionId: c.id, label: `Claim "${c.name}"` });
     return { text: `You can claim ${claimable.length} mission${claimable.length > 1 ? "s" : ""}: ${claimable.map((c) => c.name).join(", ")}. Confirm in your wallet.` };
   }
   if (/leaderboard|rank|standing|top stacker/.test(t)) {
-    return { text: "Open the Leaderboard tab — you're ranked against every stacker by XP, balance, goal progress, and yield." };
+    return { text: "Open the Leaderboard tab - you're ranked against every stacker by XP, balance, goal progress, and yield." };
   }
-  // Claim (yield) must be checked before the Grow branch — "claim my yield" contains "yield".
+  // Claim (yield) must be checked before the Grow branch - "claim my yield" contains "yield".
   if (/\bclaim\b/.test(t)) {
     actions.push({ type: "claimYield", label: "Claim simulated yield" });
     return {
@@ -395,11 +396,11 @@ async function rulesEngine(
   // even before a wallet is connected (the "connect wallet" fallback is below).
   if (/\bstack\b/.test(t) && /(switch|move|go|put|set|into?)\b/.test(t)) {
     actions.push({ type: "setMode", mode: 0, label: "Switch to Stack mode" });
-    return { text: "Moving you to Stack mode — funds held safely in the vault. Confirm in your wallet." };
+    return { text: "Moving you to Stack mode - funds held safely in the vault. Confirm in your wallet." };
   }
   if (/\b(grow|yield|earn|deploy|compound)\b/.test(t) && !/stack/.test(t)) {
     actions.push({ type: "setMode", mode: 1, label: "Switch to Grow mode" });
-    return { text: `Switching you to Grow mode — your zkLTC will earn a simulated ~5% APY toward the halving. Confirm in your wallet.` };
+    return { text: `Switching you to Grow mode - your zkLTC will earn a simulated ~5% APY toward the halving. Confirm in your wallet.` };
   }
   if (/\b(stack|safe|hold|secure)\b/.test(t) && !s) {
     return { text: "Connect your wallet and deposit zkLTC, then I can audit your stack." };
@@ -407,12 +408,12 @@ async function rulesEngine(
   if (/deposit/.test(t)) {
     const a = num();
     if (a) actions.push({ type: "deposit", amount: a, label: `Deposit ${a} zkLTC` });
-    return { text: a ? `Prepared a deposit of ${a} zkLTC — confirm in your wallet.` : "How much zkLTC would you like to deposit?" };
+    return { text: a ? `Prepared a deposit of ${a} zkLTC - confirm in your wallet.` : "How much zkLTC would you like to deposit?" };
   }
   if (/withdraw/.test(t)) {
     const a = num();
     if (a) actions.push({ type: "withdraw", amount: a, label: `Withdraw ${a} zkLTC` });
-    return { text: a ? `Prepared a withdrawal of ${a} zkLTC — confirm in your wallet.` : "How much would you like to withdraw?" };
+    return { text: a ? `Prepared a withdrawal of ${a} zkLTC - confirm in your wallet.` : "How much would you like to withdraw?" };
   }
   if (/goal|target/.test(t)) {
     const a = num();
@@ -428,7 +429,7 @@ async function rulesEngine(
       text: `You're in ${s.mode === "grow" ? "Grow" : "Stack"} mode with ${money(s.total)} zkLTC. ${
         s.mode === "grow"
           ? `Risk: low-moderate (principal custodied 1:1, ~${money(s.pendingYield)} zkLTC simulated yield accrued).`
-          : "Risk: minimal — funds are held safely, earning nothing. Switch to Grow to start compounding."
+          : "Risk: minimal - funds are held safely, earning nothing. Switch to Grow to start compounding."
       }`,
     };
   }
@@ -439,11 +440,11 @@ async function rulesEngine(
     return {
       text: `At your current ${s.mode} pace you'd reach ~${money(s.projected)} zkLTC by the halving vs your ${money(
         s.goal
-      )} goal — ${reached ? "on pace ✅." : `short by ~${money(s.goal - s.projected)}. Switching to Grow would help.`}`,
+      )} goal - ${reached ? "on pace ✅." : `short by ~${money(s.goal - s.projected)}. Switching to Grow would help.`}`,
     };
   }
   if (/halving|countdown|when/.test(t)) {
-    return { text: `The next Litecoin halving is ~${s ? s.daysToHalving : "—"} days out (est. Aug 2027). Stack hard until then.` };
+    return { text: `The next Litecoin halving is ~${s ? s.daysToHalving : "-"} days out (est. Aug 2027). Stack hard until then.` };
   }
   return {
     text: "I'm your vault guardian. Ask me to check your stack, switch modes, set a goal, deposit/withdraw, claim missions, or run Auto-Pilot.",

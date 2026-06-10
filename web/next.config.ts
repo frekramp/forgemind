@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // wagmi v3's `wagmi/connectors` barrel statically re-exports every connector
 // (porto, tempo, coinbase, metamask, safe, walletconnect, base…), each with
 // optional peer deps we don't install. We only use the `injected` connector,
-// so we alias those unused modules to `false` (empty) — webpack then resolves
+// so we alias those unused modules to `false` (empty) - webpack then resolves
 // them cleanly instead of emitting "module not found" warnings.
 const UNUSED_CONNECTOR_DEPS = [
   "porto",

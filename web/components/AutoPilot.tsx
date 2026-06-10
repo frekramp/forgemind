@@ -24,7 +24,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
       >
         <div className="space-y-4">
           <p className="text-sm leading-relaxed text-muted">
-            The agent runs a rule on a timer and <span className="text-text">acts on-chain automatically</span> — you
+            The agent runs a rule on a timer and <span className="text-text">acts on-chain automatically</span> - you
             still confirm each transaction in your wallet. Pick a strategy:
           </p>
 

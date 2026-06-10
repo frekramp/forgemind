@@ -12,7 +12,7 @@ export type TabKey =
   | "autopilot"
   | "decisions";
 
-// Focused, agent-first nav — just the three surfaces that tell the AI-agent story.
+// Focused, agent-first nav - just the three surfaces that tell the AI-agent story.
 // Missions / Leaderboard / Activity / Analytics still exist as components (Dashboard can
 // still render them); add a line back here to resurface one in the tab bar.
 const TABS: { key: TabKey; label: string; icon: LucideIcon }[] = [

@@ -24,7 +24,7 @@ export function ProjectionChart({
   const growArea = `${grow} L 100 ${H} L 0 ${H} Z`;
   const stack = `M 0 ${stackY} L 100 ${stackY}`;
 
-  // Crisp HTML overlay positions (percent of height) — don't distort with the stretched SVG.
+  // Crisp HTML overlay positions (percent of height) - don't distort with the stretched SVG.
   const growEndPct = (growEndY / H) * 100;
   const goalPct = (goalY / H) * 100;
 
@@ -69,7 +69,7 @@ export function ProjectionChart({
             />
           )}
 
-          {/* stack baseline — clearly visible now */}
+          {/* stack baseline - clearly visible now */}
           <path
             d={stack}
             fill="none"
@@ -79,7 +79,7 @@ export function ProjectionChart({
             vectorEffect="non-scaling-stroke"
           />
 
-          {/* grow curve — bright + glow */}
+          {/* grow curve - bright + glow */}
           <path
             d={grow}
             fill="none"

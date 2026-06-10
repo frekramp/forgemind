@@ -17,7 +17,7 @@ export function AgentInsight({
 }) {
   const s = v.state;
   let tone: "info" | "warn" | "ok" = "info";
-  let msg = "Connect your wallet and deposit zkLTC — I'll help you stack toward the next halving.";
+  let msg = "Connect your wallet and deposit zkLTC - I'll help you stack toward the next halving.";
   let cta: { label: string; run: () => void } | null = null;
 
   if (s) {
@@ -31,15 +31,15 @@ export function AgentInsight({
       const reached = (isGrow ? growProj : s.total) >= s.goal;
       if (reached) {
         tone = "ok";
-        msg = `On pace — projected ${fmtNum(isGrow ? growProj : s.total, 2)} zkLTC by the halving against your ${fmtNum(s.goal, 2)} goal.`;
+        msg = `On pace - projected ${fmtNum(isGrow ? growProj : s.total, 2)} zkLTC by the halving against your ${fmtNum(s.goal, 2)} goal.`;
       } else if (!isGrow && growProj >= s.goal) {
         tone = "warn";
-        msg = `In Stack mode you'd hold ${fmtNum(s.total, 2)} — short of your ${fmtNum(s.goal, 2)} goal. Switching to Grow projects ${fmtNum(growProj, 2)} by the halving.`;
+        msg = `In Stack mode you'd hold ${fmtNum(s.total, 2)} - short of your ${fmtNum(s.goal, 2)} goal. Switching to Grow projects ${fmtNum(growProj, 2)} by the halving.`;
         cta = { label: "Switch to Grow", run: () => onSwitchMode?.(Mode.Grow) };
       } else {
         tone = "warn";
         const gap = s.goal - growProj;
-        msg = `Even in Grow you'd reach ~${fmtNum(growProj, 2)} — about ${fmtNum(gap, 2)} short of goal. Consider adding zkLTC.`;
+        msg = `Even in Grow you'd reach ~${fmtNum(growProj, 2)} - about ${fmtNum(gap, 2)} short of goal. Consider adding zkLTC.`;
       }
     }
   }

@@ -2,7 +2,7 @@
 // the client IP). A cheap first line of defense against casual cost-abuse of the public AI
 // endpoint.
 //
-// NOTE: state lives in module memory, so on serverless it is PER-INSTANCE — it throttles a
+// NOTE: state lives in module memory, so on serverless it is PER-INSTANCE - it throttles a
 // single warm instance, not the whole fleet. For a hard global cap, put a WAF rule or a
 // shared store (Vercel KV / Upstash) in front. This still meaningfully blunts a single
 // abuser hammering one instance, and pairs with the same-origin check on /api/agent.
@@ -44,7 +44,7 @@ export function clientIp(request: Request): string {
  * CSRF-style guard for browser-only endpoints. When an Origin header is present (every
  * cross-site and same-origin browser POST sends one), it must match the request host or an
  * explicit allowlist (AGENT_ALLOWED_ORIGINS, comma-separated). A missing Origin is allowed
- * through to rate-limiting only — so legitimate server-side/tooling calls aren't hard-blocked
+ * through to rate-limiting only - so legitimate server-side/tooling calls aren't hard-blocked
  * while drive-by abuse embedded on another site is.
  */
 export function originAllowed(request: Request): boolean {

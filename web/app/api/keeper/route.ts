@@ -80,7 +80,7 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 // Auth gate so a public URL can't drive the keeper's wallet. Header-only: the secret is read
-// from `x-keeper-secret` or a `Authorization: Bearer …` header (what Vercel Cron sends) — never
+// from `x-keeper-secret` or a `Authorization: Bearer …` header (what Vercel Cron sends) - never
 // a query string, which would leak into access logs, browser history, and Referer.
 function authorized(request: Request): boolean {
   const secret = process.env.KEEPER_CRON_SECRET;
@@ -92,7 +92,7 @@ function authorized(request: Request): boolean {
     return provided !== null && safeEqual(provided, secret);
   }
   // No secret configured: FAIL CLOSED by default everywhere. Unauthenticated calls are only
-  // allowed if you explicitly opt in for local dev with KEEPER_DEV_OPEN=true — so a forgotten
+  // allowed if you explicitly opt in for local dev with KEEPER_DEV_OPEN=true - so a forgotten
   // KEEPER_CRON_SECRET can never silently leave the endpoint open (incl. on preview deploys).
   return process.env.NODE_ENV !== "production" && process.env.KEEPER_DEV_OPEN === "true";
 }
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
       const goal = +formatEther(state[5]);
       const projected = +formatEther(state[7]);
 
-      // Rule 1 — auto-compound: claim yield once it crosses the threshold.
+      // Rule 1 - auto-compound: claim yield once it crosses the threshold.
       if (compound && pendingYield >= COMPOUND_THRESHOLD) {
         const txHash = await wallet.writeContract({
           address: VAULT_ADDRESS,
@@ -171,7 +171,7 @@ export async function POST(request: Request) {
         continue; // one action per user per tick
       }
 
-      // Rule 2 — auto-rebalance: if behind goal in Stack mode, move to Grow.
+      // Rule 2 - auto-rebalance: if behind goal in Stack mode, move to Grow.
       if (rebalance && mode === 0 && goal > 0 && projected < goal) {
         const txHash = await wallet.writeContract({
           address: VAULT_ADDRESS,
@@ -192,7 +192,7 @@ export async function POST(request: Request) {
 
     return Response.json({ ran: actions.length, actions, keeper: account.address });
   } catch (err) {
-    // Log only the short message — never the full object (avoids leaking tx/RPC context).
+    // Log only the short message - never the full object (avoids leaking tx/RPC context).
     console.error("keeper tick error:", err instanceof Error ? err.message : err);
     return Response.json({ ran: actions.length, actions, error: "keeper_tick_failed" }, { status: 200 });
   } finally {

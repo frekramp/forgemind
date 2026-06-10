@@ -73,7 +73,7 @@ export function useKeeper() {
   }
 
   // ⚠️ #5: all hooks above run unconditionally (rules-of-hooks compliant). The returns below
-  // are render-time branches — do NOT add hooks past this point.
+  // are render-time branches - do NOT add hooks past this point.
   if (isDemo) {
     const noop = async (): Promise<undefined> => undefined;
     return {

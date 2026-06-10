@@ -22,7 +22,7 @@ import {
 } from "viem";
 
 export type DecisionAttestation = {
-  actionLog: Address; // address(this) — the ForgeActionLog contract
+  actionLog: Address; // address(this) - the ForgeActionLog contract
   chainId: number; // block.chainid
   actor: Address; // the vault owner the decision is about
   kind: number; // ForgeActionLog.Kind
@@ -72,7 +72,7 @@ export async function signDecision(account: LocalAccount, a: DecisionAttestation
 }
 
 /**
- * Recover the address that signed a decision attestation — the client-side mirror of the
+ * Recover the address that signed a decision attestation - the client-side mirror of the
  * contract's ecrecover in logAttested(). Compare the result to the published trusted signer
  * to prove (in the browser, no server) that a decision really came from the agent's key.
  */

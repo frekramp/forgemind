@@ -10,7 +10,7 @@ import type { AutoPilotStrategy } from "@/lib/agent";
 
 export type PilotConfig = {
   strategy: AutoPilotStrategy; // "compound" | "dca" | "off"
-  cap: number; // session spend cap (zkLTC) — advisory
+  cap: number; // session spend cap (zkLTC) - advisory
   claimThreshold: number; // auto-claim when pendingYield >= this
   dcaAmount: number; // zkLTC per DCA tick
   dcaIntervalMin: number; // minutes between DCA deposits
@@ -91,7 +91,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
       try {
         await record?.(kind, ActionEngine.Rules, amountWei, reason);
       } catch {
-        /* notarize rejected — the autonomous action itself already went through */
+        /* notarize rejected - the autonomous action itself already went through */
       }
     },
     [record]
@@ -110,7 +110,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
       if (!s) return;
 
       try {
-        // Rule 1: compound — claim accrued yield once it crosses the threshold (Grow only)
+        // Rule 1: compound - claim accrued yield once it crosses the threshold (Grow only)
         if (config.strategy === "compound" && s.mode === Mode.Grow && s.pendingYield >= config.claimThreshold) {
           inFlight.current = true;
           pushLog(`Auto-claiming ${s.pendingYield.toFixed(4)} zkLTC yield…`);
@@ -124,7 +124,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
           );
           return;
         }
-        // Rule 2: DCA — recurring deposit on a schedule, under the spend cap
+        // Rule 2: DCA - recurring deposit on a schedule, under the spend cap
         if (config.strategy === "dca") {
           const due = Date.now() - lastDcaAt.current >= config.dcaIntervalMin * 60_000;
           const underCap = spent + config.dcaAmount <= config.cap;
@@ -146,7 +146,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
               `Auto-DCA: ${config.dcaAmount} zkLTC deposit (session cap ${config.cap})`
             );
           } else if (due && !underCap) {
-            pushLog(`DCA paused — session cap (${config.cap} zkLTC) reached.`);
+            pushLog(`DCA paused - session cap (${config.cap} zkLTC) reached.`);
             setConfig({ strategy: "off" });
           }
         }

@@ -54,7 +54,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted">Progress to goal</span>
             <span className="tnum font-mono">
-              {fmtNum(currentAnim, 2)} / {goalNum > 0 ? fmtNum(goalNum, 2) : "—"}
+              {fmtNum(currentAnim, 2)} / {goalNum > 0 ? fmtNum(goalNum, 2) : "-"}
             </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-bg">
@@ -85,7 +85,7 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
         </div>
         <p className="text-[11px] leading-relaxed text-dim">
           Goal must exceed your current balance. Grow-mode yield is a simulated 5% APY paid from a testnet
-          reward pool — principal is always custodied 1:1.
+          reward pool - principal is always custodied 1:1.
         </p>
       </div>
     </Panel>

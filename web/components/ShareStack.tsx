@@ -121,7 +121,7 @@ function ShareModal({ onClose }: { onClose: () => void }) {
           )}
 
           <div className="mt-5 grid grid-cols-3 gap-3">
-            <Metric icon={Trophy} label="Rank" value={rank ? `#${rank}` : "—"} />
+            <Metric icon={Trophy} label="Rank" value={rank ? `#${rank}` : "-"} />
             <Metric icon={TrendingUp} label="Projected" value={fmtNum(projected, 1)} />
             <Metric icon={Flame} label="Halving in" value={`${days}d`} />
           </div>

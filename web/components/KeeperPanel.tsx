@@ -18,7 +18,7 @@ const DURATIONS = [
 
 type RunResult = { ran: number; actions: { user: string; action: string; txHash: string }[]; note?: string } | null;
 
-/** On-chain autonomous keeper — grant a capped, revocable delegation that runs server-side
+/** On-chain autonomous keeper - grant a capped, revocable delegation that runs server-side
  *  24/7 (no browser, no per-tx clicks). This is what makes "AI agent" literally true. */
 export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const k = useKeeper();
@@ -55,7 +55,7 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
     >
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-muted">
-          Grant the agent an <span className="text-text">on-chain delegation</span> and it runs server-side 24/7 —
+          Grant the agent an <span className="text-text">on-chain delegation</span> and it runs server-side 24/7 -
           auto-compounding yield and rebalancing toward your goal with <span className="text-text">no browser open and no
           per-tx clicks</span>. Capped by an expiry, revocable instantly, and it can only ever move your own funds.
         </p>
@@ -162,7 +162,7 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
             Right now the keeper would{" "}
             {v.state.pendingYield >= 0.01
               ? `auto-compound ~${fmtNum(v.state.pendingYield, 4)} zkLTC`
-              : "wait — yield below the 0.01 threshold"}
+              : "wait - yield below the 0.01 threshold"}
             .
           </p>
         )}

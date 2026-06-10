@@ -55,7 +55,7 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
             <div className="mt-2 text-xs text-muted">
               {isGrow
                 ? `${fmtNum(withdrawable, 2)} principal · ${fmtNum(pending, 4)} yield accruing`
-                : "Held safely — switch to Grow to start compounding."}
+                : "Held safely - switch to Grow to start compounding."}
             </div>
           </div>
           {isGrow && pending > 0 && (
@@ -115,7 +115,7 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
             disabled={busy}
             className="w-full rounded-lg border border-border bg-bg py-2 text-xs text-muted transition-colors hover:border-ember hover:text-ember disabled:opacity-50"
           >
-            Exit all — withdraw {fmtNum(withdrawable, 2)} zkLTC
+            Exit all - withdraw {fmtNum(withdrawable, 2)} zkLTC
             {isGrow && pending > 0 ? ` + ${fmtNum(pending, 4)} yield` : ""} in one tx
           </button>
         )}

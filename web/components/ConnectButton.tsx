@@ -191,7 +191,7 @@ export function NoWalletHint() {
       rel="noopener noreferrer"
       className="mt-3 inline-flex items-center gap-1 text-xs text-dim transition-colors hover:text-ember"
     >
-      No wallet detected — install MetaMask <ExternalLink size={11} />
+      No wallet detected - install MetaMask <ExternalLink size={11} />
     </a>
   );
 }
@@ -201,6 +201,6 @@ function prettyError(msg: string): string {
   if (m.includes("rejected") || m.includes("denied")) return "Connection request rejected in your wallet.";
   if (m.includes("not found") || m.includes("no injected") || m.includes("provider"))
     return "No wallet found. Install MetaMask, then refresh.";
-  if (m.includes("chain") || m.includes("network")) return "Couldn't switch to LiteForge — approve the network in your wallet.";
+  if (m.includes("chain") || m.includes("network")) return "Couldn't switch to LiteForge - approve the network in your wallet.";
   return msg.length > 120 ? msg.slice(0, 120) + "…" : msg;
 }

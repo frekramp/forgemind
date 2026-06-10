@@ -1,6 +1,6 @@
 import { defineChain } from "viem";
 
-/** LiteForge — Litecoin's EVM testnet (Caldera-hosted, chain id 4441). */
+/** LiteForge - Litecoin's EVM testnet (Caldera-hosted, chain id 4441). */
 export const liteforge = defineChain({
   id: 4441,
   name: "LiteForge",

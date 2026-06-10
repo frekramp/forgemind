@@ -170,7 +170,7 @@ export async function GET(request: Request) {
       }
 
       // 4) attach timestamp + nearest matching vault tx (same actor, compatible type,
-      //    settled at or just before the notarize — which is signed right after the action)
+      //    settled at or just before the notarize - which is signed right after the action)
       for (const d of recent) {
         d.timestamp = tsMap.get(d.block) ?? 0;
         const wantType = KIND_TO_VAULT[d.kind];

@@ -61,7 +61,7 @@ export function ActivityFeed() {
       <div className="space-y-1">
         {isLoading && items.length === 0 && <Empty text="Loading on-chain activity…" />}
         {!isLoading && items.length === 0 && (
-          <Empty text={scope === "me" ? "No activity yet — make your first move." : "No vault activity yet."} />
+          <Empty text={scope === "me" ? "No activity yet - make your first move." : "No vault activity yet."} />
         )}
         {items.map((it, i) => {
           const m = META[it.type];

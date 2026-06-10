@@ -77,7 +77,7 @@ export function Dashboard() {
       <Header />
       <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-6">
         {!connected && tab === "overview" ? (
-          // Clean full-viewport landing — no tab bar / dev banners cluttering the first impression.
+          // Clean full-viewport landing - no tab bar / dev banners cluttering the first impression.
           <ConnectGate onDemo={() => setDemo(true)} />
         ) : (
           <div className="space-y-5">
@@ -197,7 +197,7 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
           className="animate-rise-in mx-auto mt-5 max-w-xl text-balance text-[15px] leading-relaxed text-muted"
           style={{ animationDelay: "130ms" }}
         >
-          Chat with an on-chain agent that executes real transactions — switch modes, set a halving goal, and let it
+          Chat with an on-chain agent that executes real transactions - switch modes, set a halving goal, and let it
           run your stack <span className="text-text">autonomously</span> toward the next Litecoin halving.
         </p>
 
@@ -221,7 +221,7 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
         <NoWalletHint />
         <div className="label mt-4 text-dim">no wallet needed for the demo · chain 4441 · gas in zkLTC</div>
 
-        {/* feature strip — a single unified band, not three floating cards */}
+        {/* feature strip - a single unified band, not three floating cards */}
         <div
           className="animate-rise-in mt-14 grid w-full max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3"
           style={{ animationDelay: "320ms" }}
@@ -266,7 +266,7 @@ function DemoBanner({ onExit }: { onExit: () => void }) {
         Demo
       </span>
       <span className="text-muted">
-        You&apos;re viewing <span className="text-text">sample data</span> — no wallet connected and nothing is on-chain.
+        You&apos;re viewing <span className="text-text">sample data</span> - no wallet connected and nothing is on-chain.
       </span>
       <button
         onClick={onExit}

@@ -51,7 +51,7 @@ export function AgentChat({
     {
       role: "assistant",
       content:
-        "I'm your ForgeMind Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC — I'll prepare the transaction for you to sign.",
+        "I'm your ForgeMind Guardian. Ask me to audit your stack, switch modes, set a halving goal, or move zkLTC - I'll prepare the transaction for you to sign.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -68,7 +68,7 @@ export function AgentChat({
   }, [messages, busy, reveal]);
 
   // Proactive: once a wallet connects and on-chain state loads, the Guardian speaks first
-  // with a personalized insight — but only if the user hasn't started the conversation.
+  // with a personalized insight - but only if the user hasn't started the conversation.
   useEffect(() => {
     if (!v.address || !v.state) return;
     if (greeted.current === v.address) return;
@@ -99,14 +99,14 @@ export function AgentChat({
       await playReveal(data);
     } catch {
       setBusy(false);
-      setMessages((m) => [...m, { role: "assistant", content: "I couldn't reach the agent — try again." }]);
+      setMessages((m) => [...m, { role: "assistant", content: "I couldn't reach the agent - try again." }]);
     }
   }
 
   // Reveal the response progressively: cascade the reasoning steps, then type the answer.
   async function playReveal(data: { text?: string; actions?: AgentAction[]; trace?: TraceStep[] }) {
     const steps = data.trace ?? [];
-    const full = data.text ?? "Done — check the dashboard.";
+    const full = data.text ?? "Done - check the dashboard.";
     setReveal({ steps: [], text: "" });
     for (let i = 0; i < steps.length; i++) {
       await sleep(steps[i].kind === "read" ? 380 : 260);
@@ -153,7 +153,7 @@ export function AgentChat({
         try {
           await record?.(kind, engineFromString(engine), amountWei, a.label);
         } catch {
-          /* notarize rejected — the action itself already went through */
+          /* notarize rejected - the action itself already went through */
         }
       }
     } catch {
@@ -169,7 +169,7 @@ export function AgentChat({
       right={
         <span className="flex items-center gap-1.5 text-[11px] text-dim">
           <span className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse-ember" />
-          {engine === "claude" ? "Claude · live" : engine === "rules" ? "rule-based" : "online"}
+          online
         </span>
       }
       className="flex h-full flex-col"
@@ -286,7 +286,7 @@ function WelcomeCard({ onPick }: { onPick: (text: string) => void }) {
   );
 }
 
-/** The live, expanded reasoning view shown while the response streams in —
+/** The live, expanded reasoning view shown while the response streams in -
  *  steps cascade in, the latest one pulses until the next arrives or the answer types. */
 function LiveTrace({ steps, typing }: { steps: TraceStep[]; typing: boolean }) {
   return (
@@ -306,7 +306,7 @@ function LiveTrace({ steps, typing }: { steps: TraceStep[]; typing: boolean }) {
               )}
               <div className="min-w-0">
                 <span className="text-muted">{st.label}</span>
-                {st.detail && <span className="ml-1 text-dim">— {st.detail}</span>}
+                {st.detail && <span className="ml-1 text-dim">- {st.detail}</span>}
               </div>
             </div>
           );
@@ -316,7 +316,7 @@ function LiveTrace({ steps, typing }: { steps: TraceStep[]; typing: boolean }) {
   );
 }
 
-/** Collapsible view of the agent's tool-by-tool reasoning — makes the multi-step,
+/** Collapsible view of the agent's tool-by-tool reasoning - makes the multi-step,
  *  read-then-act loop visible instead of hiding it behind the final answer. */
 function ReasoningTrace({ steps }: { steps: TraceStep[] }) {
   const [open, setOpen] = useState(false);
@@ -339,7 +339,7 @@ function ReasoningTrace({ steps }: { steps: TraceStep[] }) {
               />
               <div className="min-w-0">
                 <span className="text-muted">{st.label}</span>
-                {st.detail && <span className="ml-1 text-dim">— {st.detail}</span>}
+                {st.detail && <span className="ml-1 text-dim">- {st.detail}</span>}
               </div>
             </div>
           ))}

@@ -18,7 +18,11 @@ export function Panel({
     <section className={cn("card-elev rounded-2xl border border-border bg-panel", className)}>
       {(label || right) && (
         <header className="flex items-center justify-between border-b border-border px-6 py-4">
-          {label ? <span className="label">{label}</span> : <span />}
+          {label ? (
+            <span className="text-[11px] font-semibold uppercase leading-none tracking-[0.1em] text-ember">{label}</span>
+          ) : (
+            <span />
+          )}
           {right}
         </header>
       )}

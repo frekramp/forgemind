@@ -29,7 +29,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
             transaction in your wallet.
           </p>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 stagger">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 stagger">
             <StrategyCard
               active={config.strategy === "compound"}
               icon={Coins}
@@ -43,13 +43,6 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
               title="Auto-DCA"
               desc="Deposit a fixed amount on a schedule."
               onClick={() => setConfig({ strategy: "dca", running: false })}
-            />
-            <StrategyCard
-              active={config.strategy === "off"}
-              icon={Power}
-              title="Off"
-              desc="Pause all autonomous actions."
-              onClick={() => setConfig({ strategy: "off", running: false })}
             />
           </div>
 

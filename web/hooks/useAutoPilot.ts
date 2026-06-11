@@ -45,6 +45,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
   const inFlight = useRef(false);
   const lastActionAt = useRef(0);
   const lastDcaAt = useRef(0);
+  const quietStop = useRef(false); // set when a tick already logged why it's stopping (cancel/cap)
 
   // hydrate from localStorage (client only)
   useEffect(() => {
@@ -52,9 +53,10 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
       const raw = localStorage.getItem(LS_KEY);
       if (raw) {
         const p = JSON.parse(raw);
-        // SSR-safe hydration: restore persisted pilot config once after mount.
+        // SSR-safe hydration: restore the strategy/settings once after mount, but always resume
+        // PAUSED so a reload never auto-fires a transaction. The user presses Start to arm it.
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setConfigState({ ...DEFAULT, ...p.config });
+        setConfigState({ ...DEFAULT, ...p.config, running: false });
         setSpent(p.spent ?? 0);
         lastDcaAt.current = p.lastDcaAt ?? 0;
       }
@@ -162,6 +164,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
           // A rejected/failed tx is a stop signal: pause the loop so it flips back to Start and
           // stops re-prompting, instead of silently retrying on the next tick.
           pushLog("Auto-Compound paused: you cancelled or the claim failed. Press Start to resume.");
+          quietStop.current = true;
           setConfigRef.current({ running: false });
         } finally {
           inFlight.current = false;
@@ -173,8 +176,9 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
       if (cfg.strategy === "dca") {
         if (Date.now() - lastDcaAt.current < cfg.dcaIntervalMin * 60_000) return; // not due yet
         if (sp + cfg.dcaAmount > cfg.cap) {
-          pushLog(`DCA paused: session cap (${cfg.cap} zkLTC) reached.`);
-          setConfigRef.current({ strategy: "off" });
+          pushLog(`Auto-DCA stopped: session cap (${cfg.cap} zkLTC) reached.`);
+          quietStop.current = true;
+          setConfigRef.current({ running: false });
           return;
         }
         if (vv.walletBalance < cfg.dcaAmount) return;
@@ -195,6 +199,7 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
           // A rejected/failed tx is a stop signal: pause the loop so it flips back to Start and
           // stops re-prompting, instead of silently retrying on the next tick.
           pushLog("Auto-DCA paused: you cancelled or the deposit failed. Press Start to resume.");
+          quietStop.current = true;
           setConfigRef.current({ running: false });
         } finally {
           inFlight.current = false;
@@ -204,7 +209,12 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
 
     const id = setInterval(tick, TICK_MS);
     void tick(); // fire the first check immediately on Start so the user sees it act
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      // Always give feedback when the loop stops, unless a tick already logged the specific reason.
+      if (quietStop.current) quietStop.current = false;
+      else pushLog("Auto-Pilot paused. Press Start to resume.");
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- arms only on enable change; handlers/config read via stable refs
   }, [enabled]);
 

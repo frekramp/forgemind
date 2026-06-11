@@ -60,9 +60,9 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
     >
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-muted">
-          Grant the agent an <span className="text-text">on-chain delegation</span> and it runs server-side 24/7,
-          auto-compounding yield and rebalancing toward your goal with <span className="text-text">no browser open and no
-          per-tx clicks</span>. Capped by an expiry, revocable instantly, and it can only ever move your own funds.
+          The keeper is a helper that works for you <span className="text-text">24/7, even when this site is closed</span>.
+          You give it permission once (a single signature), and from then on it can do just two things with your own
+          zkLTC, automatically:
         </p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -70,20 +70,20 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
             active={compound}
             icon={Coins}
             title="Auto-compound"
-            desc="Claim yield once it builds up."
+            desc="When your earned yield builds up, claim it back into your stack."
             onClick={() => setCompound((x) => !x)}
           />
           <Toggle
             active={rebalance}
             icon={Repeat}
             title="Auto-rebalance"
-            desc="Move to Grow when behind goal."
+            desc="If you fall behind your goal in Stack mode, switch to Grow so it earns."
             onClick={() => setRebalance((x) => !x)}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="label">Until</span>
+          <span className="label">For</span>
           <div className="flex gap-1 rounded-lg border border-border bg-bg p-0.5">
             {DURATIONS.map((d, i) => (
               <button
@@ -99,6 +99,13 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
             ))}
           </div>
         </div>
+
+        <p className="text-[11px] leading-relaxed text-dim">
+          That&apos;s how long the permission lasts. It expires on its own afterward, and you can{" "}
+          <span className="text-muted">Revoke</span> it instantly anytime. The keeper can{" "}
+          <span className="text-muted">never withdraw or send your funds anywhere</span>. It only compounds or
+          rebalances what&apos;s already in your vault.
+        </p>
 
         {k.active && (
           <div className="flex items-center justify-between rounded-lg border border-gain/25 bg-gain/5 px-3 py-2 text-xs">

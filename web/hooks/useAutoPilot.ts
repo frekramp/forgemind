@@ -119,8 +119,12 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
   // can't immediately re-prompt), and a per-DCA interval that's also armed before the prompt.
   useEffect(() => {
     if (!enabled) return;
-    // Don't deposit the instant DCA is switched on — start the schedule from now.
-    if (cfgRef.current.strategy === "dca" && lastDcaAt.current === 0) lastDcaAt.current = Date.now();
+    // The user explicitly pressed Start: fire the first action right away so they see it work (one
+    // wallet prompt on a real wallet; instant on the demo), then continue on schedule. The in-flight
+    // guard, 30s cooldown, and DCA interval below still block any rapid re-fire.
+    lastActionAt.current = 0;
+    if (cfgRef.current.strategy === "dca") lastDcaAt.current = 0;
+    pushLog(cfgRef.current.strategy === "dca" ? "Auto-DCA started." : "Auto-Compound started.");
 
     const tick = async () => {
       if (inFlight.current) return;
@@ -179,8 +183,10 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
     };
 
     const id = setInterval(tick, TICK_MS);
+    void tick(); // fire the first check immediately on Start so the user sees it act
     return () => clearInterval(id);
-  }, [enabled, pushLog, notarize, persist]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- arms only on enable change; handlers/config read via stable refs
+  }, [enabled]);
 
   const resetSpent = useCallback(() => {
     setSpent(0);

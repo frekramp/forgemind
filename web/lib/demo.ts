@@ -3,7 +3,7 @@
 // banner); it never touches the chain and all writes are no-ops in demo mode.
 import type { Address } from "viem";
 import { Mode } from "./contracts";
-import { toWei } from "./format";
+import { toWei, weiToNum } from "./format";
 import { daysToHalving, projectStack } from "./halving";
 import { levelProgress } from "./missions";
 import { ActionEngine, ActionKind, type DecisionEntry } from "./actionlog";
@@ -104,5 +104,32 @@ export function demoDecisions(): DecisionEntry[] {
     base(ActionKind.SetGoal, ActionEngine.Claude, 250, "Set halving goal to 250 zkLTC", 10_800, "goal", "250", mkAtt(0, "0x62ecdee8174eb9a4dd56b24464b69918b741aad366cc8659693ccf03d7586a1f79ab70b4b34461efe8ac0dccd74e475b8e60c9fe4f799ed1e6c9f175aa9c7dc61b")),
     base(ActionKind.Deposit, ActionEngine.Manual, 100, "Initial deposit", 172_800, "deposit", "100"),
   ];
+}
+
+let liveDemoSeq = 0;
+/** Build a live Decisions entry for an action taken in demo mode, so the ledger updates as the
+ *  user acts through the agent. Unattested (no real signature), with fake but valid-hex tx hashes. */
+export function makeDemoDecision(
+  kind: ActionKind,
+  engine: ActionEngine,
+  amountWei: bigint,
+  reason: string
+): DecisionEntry {
+  liveDemoSeq += 1;
+  const amt = weiToNum(amountWei);
+  return {
+    actor: DEMO_ADDRESS,
+    kind,
+    engine,
+    attested: false,
+    amount: amt,
+    reason,
+    timestamp: Math.floor(Date.now() / 1000),
+    txHash: fakeTx((liveDemoSeq + 30).toString()),
+    block: 1_000_500 + liveDemoSeq,
+    outcomeTx: fakeTx((liveDemoSeq + 60).toString()),
+    outcomeType: "tx",
+    outcomeAmount: amt > 0 ? String(amt) : undefined,
+  };
 }
 

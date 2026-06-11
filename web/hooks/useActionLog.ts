@@ -10,7 +10,7 @@ import {
   type DecisionEntry,
 } from "@/lib/actionlog";
 import { useDemoMode } from "@/components/DemoProvider";
-import { demoDecisions } from "@/lib/demo";
+import { demoDecisions, makeDemoDecision } from "@/lib/demo";
 
 const NOTARIZE_KEY = "forgemind.notarize";
 const MAX_REASON = 160; // matches ForgeActionLog.MAX_REASON (bytes)
@@ -122,6 +122,18 @@ export function useActionLog() {
     [notarize, writeContractAsync]
   );
 
+  // In demo mode the Decisions ledger is a live, in-memory store: notarizing a demo action
+  // appends a real entry so the tab updates as the user acts through the agent (chain untouched).
+  const [demoLog, setDemoLog] = useState<DecisionEntry[]>(demoDecisions);
+  const demoRecord = useCallback(
+    async (kind: ActionKind, engine: ActionEngine, amountWei: bigint, reason: string): Promise<undefined> => {
+      if (!notarize) return undefined; // honor the Notarize toggle, same as the on-chain path
+      setDemoLog((l) => [makeDemoDecision(kind, engine, amountWei, reason), ...l].slice(0, 60));
+      return undefined;
+    },
+    [notarize]
+  );
+
   const { isDemo } = useDemoMode();
   if (isDemo) {
     const noop = async (...args: unknown[]): Promise<undefined> => {
@@ -129,12 +141,12 @@ export function useActionLog() {
       return undefined;
     };
     return {
-      entries: demoDecisions(),
+      entries: demoLog,
       isLoading: false,
       deployed: true,
       notarize,
       setNotarize,
-      record: noop,
+      record: demoRecord,
       refetch: noop,
     };
   }

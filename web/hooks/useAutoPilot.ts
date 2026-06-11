@@ -159,7 +159,10 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
           pushLog("Claimed yield", tx);
           await notarize(ActionKind.AutoCompound, 0n, `Auto-Compound: yield ${s.pendingYield.toFixed(4)} >= ${cfg.claimThreshold} threshold`);
         } catch {
-          pushLog("Auto-Compound cancelled or failed.");
+          // A rejected/failed tx is a stop signal: pause the loop so it flips back to Start and
+          // stops re-prompting, instead of silently retrying on the next tick.
+          pushLog("Auto-Compound paused: you cancelled or the claim failed. Press Start to resume.");
+          setConfigRef.current({ running: false });
         } finally {
           inFlight.current = false;
         }
@@ -189,7 +192,10 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
           pushLog(`Deposited ${cfg.dcaAmount} zkLTC`, tx);
           await notarize(ActionKind.AutoDCA, toWei(String(cfg.dcaAmount)), `Auto-DCA: ${cfg.dcaAmount} zkLTC deposit (session cap ${cfg.cap})`);
         } catch {
-          pushLog("DCA deposit cancelled or failed.");
+          // A rejected/failed tx is a stop signal: pause the loop so it flips back to Start and
+          // stops re-prompting, instead of silently retrying on the next tick.
+          pushLog("Auto-DCA paused: you cancelled or the deposit failed. Press Start to resume.");
+          setConfigRef.current({ running: false });
         } finally {
           inFlight.current = false;
         }

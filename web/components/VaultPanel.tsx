@@ -161,15 +161,15 @@ function AmountBox({
       <div className="flex items-center justify-between">
         <span className="label">{label}</span>
         <button onClick={onMax} className="text-[10px] text-dim transition-colors hover:text-ember">
-          max {fmtNum(max, 3)}
+          max {fmtNum(max, 6)}
         </button>
       </div>
       <input
         inputMode="decimal"
         value={value}
-        placeholder="0.0"
+        placeholder="Enter an amount"
         onChange={(e) => onChange(e.target.value.replace(/[^0-9.]/g, ""))}
-        className="tnum w-full bg-transparent font-mono text-lg text-text outline-none placeholder:text-dim"
+        className="tnum w-full bg-transparent font-mono text-lg text-text outline-none placeholder:font-sans placeholder:text-sm placeholder:text-dim"
       />
       {cta}
     </div>

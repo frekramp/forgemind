@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     "The only AI agent on LitVM that reads your on-chain vault, reasons, acts, and notarizes every decision on-chain. Stack hard money toward the Litecoin halving, on LiteForge.",
 };
 
-// Light is the default; only switch to dark if explicitly stored. Runs before paint (no flash).
-const themeInit = `(function(){try{if(localStorage.getItem('forgemind.theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`;
+// Dark is the default; only switch to light if explicitly stored. Runs before paint (no flash).
+const themeInit = `(function(){try{if(localStorage.getItem('forgemind.theme')!=='light')document.documentElement.classList.add('dark')}catch(e){document.documentElement.classList.add('dark')}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

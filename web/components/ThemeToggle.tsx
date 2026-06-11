@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 
-/** Light/dark toggle. Light is the default; flips the `dark` class on <html> (CSS vars do the
+/** Light/dark toggle. Dark is the default; flips the `dark` class on <html> (CSS vars do the
  *  rest), persists the choice, and adds a brief `.theme-transition` so colors crossfade. */
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);

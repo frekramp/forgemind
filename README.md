@@ -2,7 +2,7 @@
 
 **A truly agentic AI for your zkLTC stack, on LiteForge.**
 
-**▶ Live:** https://forgemindapp.xyz  ·  **30-second demo (no wallet):** https://forgemindapp.xyz/?demo=1
+**▶ Live:** https://forgemindapp.xyz  ·  **demo (no wallet):** https://forgemindapp.xyz/?demo=1
 
 ForgeMind is an AI-powered smart vault for **zkLTC** on [LiteForge](https://www.litvm.com/) (Litecoin's EVM testnet, chain `4441`). Deposit zkLTC, then **chat with an on-chain agent that executes real transactions** - switch between safe **Stack** mode and yield-bearing **Grow** mode, set a **Litecoin-halving goal**, and watch your projected stack.
 

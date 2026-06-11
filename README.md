@@ -72,6 +72,8 @@ forgemind/
 | `ForgeProfile` | On-chain missions, XP/levels, usernames, leaderboard registry. |
 | `ForgeActionLog` | Tamper-evident ledger of agent decisions (Kind + Engine + reason); attested entries carry a trusted-signer signature verified on-chain in `logAttested`. |
 
+> **🔒 Security:** the fund paths are reentrancy-safe and **solvent by construction**, the agent and keeper are **non-custodial** (they never hold keys; the keeper is capped, revocable, and only ever moves your own funds), and **all 75 tests pass**. Full threat model + report in **[SECURITY.md](SECURITY.md)**.
+
 ---
 
 ## Run locally

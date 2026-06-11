@@ -55,12 +55,16 @@ export function AgentChat({
   const [engine, setEngine] = useState<"claude" | "rules" | null>(null);
   // Transient "streaming reveal": the agent's steps cascade in, then the answer types out.
   const [reveal, setReveal] = useState<{ steps: TraceStep[]; text: string } | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const greeted = useRef<string | undefined>(undefined);
   const { isDemo } = useDemoMode();
 
+  // Keep the chat pinned to its latest message by scrolling the chat container ITSELF. Using
+  // scrollIntoView here scrolled the whole PAGE to the bottom on load (the demo greeting posts a
+  // message immediately), which was the auto-scroll-to-bottom bug.
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, busy, reveal]);
 
   // Proactive: once a wallet connects and on-chain state loads, the Guardian speaks first
@@ -204,7 +208,7 @@ export function AgentChat({
       className="flex h-full flex-col"
       bodyClassName="flex flex-1 flex-col p-0 min-h-0"
     >
-      <div className="flex-1 space-y-4 overflow-y-auto p-5">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-5">
         {messages.map((m, i) => (
           <div key={i} className={cn("flex animate-rise-in flex-col gap-2", m.role === "user" ? "items-end" : "items-start")}>
             <div
@@ -260,7 +264,6 @@ export function AgentChat({
             )}
           </div>
         )}
-        <div ref={endRef} />
       </div>
 
       <div className="space-y-3 border-t border-border p-4">

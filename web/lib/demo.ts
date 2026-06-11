@@ -10,8 +10,6 @@ import { ActionEngine, ActionKind, type DecisionEntry } from "./actionlog";
 import type { VaultState } from "@/hooks/useVault";
 import type { MissionState } from "@/hooks/useMissions";
 import type { LeaderRow } from "@/hooks/useLeaderboard";
-import type { Analytics } from "@/hooks/useAnalytics";
-import type { ActivityItem } from "@/hooks/useActivity";
 
 export const DEMO_ADDRESS = "0x5A71c0FFEe1234567890aBCdef1234567890DeAd" as Address;
 export const DEMO_USERNAME = "satoshi_jr";
@@ -108,18 +106,3 @@ export function demoDecisions(): DecisionEntry[] {
   ];
 }
 
-export function demoAnalytics(): Analytics {
-  return { tvl: 664.4, users: 6, aprPct: 5, daysToHalving: daysToHalving() };
-}
-
-export function demoActivity(): ActivityItem[] {
-  return [
-    { type: "yield", user: DEMO_ADDRESS, amount: "0.42", block: 999_880, txHash: fakeTx("a") },
-    { type: "mode", user: DEMO_ADDRESS, mode: 1, block: 998_920, txHash: fakeTx("b") },
-    { type: "deposit", user: "0xD1A".padEnd(42, "0"), amount: "50", block: 998_400, txHash: fakeTx("c") },
-    { type: "deposit", user: DEMO_ADDRESS, amount: "25", block: 996_400, txHash: fakeTx("d") },
-    { type: "goal", user: "0x17C".padEnd(42, "0"), amount: "200", block: 994_100, txHash: fakeTx("e") },
-    { type: "withdraw", user: "0x40D".padEnd(42, "0"), amount: "8", block: 990_200, txHash: fakeTx("f") },
-    { type: "deposit", user: DEMO_ADDRESS, amount: "100", block: 827_200, txHash: fakeTx("1") },
-  ];
-}

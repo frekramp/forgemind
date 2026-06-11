@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useVault } from "@/hooks/useVault";
-import { useMissions } from "@/hooks/useMissions";
 import { useAutoPilot } from "@/hooks/useAutoPilot";
 import { useActionLog } from "@/hooks/useActionLog";
 import { Header } from "./Header";
@@ -14,10 +13,6 @@ import { AgentChat } from "./AgentChat";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { StatStrip } from "./StatStrip";
 import { Tabs, type TabKey } from "./Tabs";
-import { Leaderboard } from "./Leaderboard";
-import { ActivityFeed } from "./ActivityFeed";
-import { Missions } from "./Missions";
-import { Analytics } from "./Analytics";
 import { AutoPilot } from "./AutoPilot";
 import { KeeperPanel } from "./KeeperPanel";
 import { AgentDecisions } from "./AgentDecisions";
@@ -28,11 +23,10 @@ import { ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles,
 import { cn } from "@/lib/cn";
 import { useEffect } from "react";
 
-const NEEDS_WALLET: TabKey[] = ["overview", "missions", "autopilot"];
+const NEEDS_WALLET: TabKey[] = ["overview", "autopilot"];
 
 export function Dashboard() {
   const v = useVault();
-  const missions = useMissions();
   const al = useActionLog(); // on-chain agent-decision ledger
   const ap = useAutoPilot(v, al.record); // mounted here so the autonomous loop survives tab switches
   const { isConnected } = useAccount();
@@ -48,12 +42,8 @@ export function Dashboard() {
   const gated = NEEDS_WALLET.includes(tab) && !connected;
 
   function renderTab() {
-    if (tab === "leaderboard") return <Leaderboard />;
-    if (tab === "activity") return <ActivityFeed />;
-    if (tab === "analytics") return <Analytics />;
     if (tab === "decisions") return <AgentDecisions al={al} />;
     if (gated) return <ConnectPrompt />;
-    if (tab === "missions") return <Missions m={missions} />;
     if (tab === "autopilot") return <AutomationTab v={v} ap={ap} />;
     // overview
     return (
@@ -88,12 +78,10 @@ export function Dashboard() {
                     <AgentChat
                       v={v}
                       record={al.record}
-                      onClaimMission={(id) => missions.claimMission(id).catch(() => {})}
                       onAutoPilot={(strategy, cap) => {
                         ap.setConfig({ strategy, cap, running: false });
                         setTab("autopilot");
                       }}
-                      onNavigate={setTab}
                     />
                   </ErrorBoundary>
                 </div>
@@ -119,11 +107,11 @@ function Orientation() {
     <div className="card-elev flex flex-col gap-4 rounded-2xl border border-border bg-panel p-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <h2 className="font-display text-[1.4rem] leading-tight tracking-tight">
-          A Forge Guardian that <span className="text-gradient-ember italic">acts on-chain</span>.
+          Start <span className="text-gradient-ember italic">here</span>.
         </h2>
         <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
-          It reads your vault, reasons, and executes real transactions you sign: switch Stack/Grow, set a halving
-          goal, and every decision is written on-chain.
+          Deposit zkLTC (the testnet asset on LiteForge), pick Stack or Grow, then ask the Forge Guardian on the right
+          to act for you. It reads your vault, reasons, and writes every decision on-chain.
         </p>
       </div>
       <div className="flex flex-shrink-0 flex-wrap gap-2">

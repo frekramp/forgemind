@@ -11,11 +11,10 @@ import { engineFromString, kindForAction } from "@/lib/actionlog";
 import { chatOpeningInsight } from "@/lib/insight";
 import { toWei } from "@/lib/format";
 import { useDemoMode } from "./DemoProvider";
-import type { TabKey } from "./Tabs";
 import { Send, Loader2, Check, BrainCircuit, ChevronDown, ChevronUp, Cog, ShieldCheck, TrendingUp, Target, Bot } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-const CHIPS = ["How safe is my stack?", "Am I on pace?", "Switch to Grow", "What missions can I claim?"];
+const CHIPS = ["How safe is my stack?", "Am I on pace?", "Switch to Grow", "Claim my yield"];
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -37,15 +36,11 @@ function demoStateOverride(s: ReturnType<typeof useVault>["state"]) {
 export function AgentChat({
   v,
   record,
-  onClaimMission,
   onAutoPilot,
-  onNavigate,
 }: {
   v: ReturnType<typeof useVault>;
   record?: ActionLog["record"];
-  onClaimMission?: (id: number) => void;
   onAutoPilot?: (strategy: AutoPilotStrategy, cap: number) => void;
-  onNavigate?: (tab: TabKey) => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -99,7 +94,14 @@ export function AgentChat({
       await playReveal(data);
     } catch {
       setBusy(false);
-      setMessages((m) => [...m, { role: "assistant", content: "I couldn't reach the agent. Try again." }]);
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          content:
+            "I couldn't reach the agent just now. Your vault and funds are untouched. Try again in a moment, or use the Vault panel directly.",
+        },
+      ]);
     }
   }
 
@@ -139,10 +141,7 @@ export function AgentChat({
         amountWei = toWei(a.amount);
         await v.setGoal(a.amount);
       } else if (a.type === "claimYield") await v.claimYield();
-      else if (a.type === "claimMission") {
-        onClaimMission?.(a.missionId);
-        onNavigate?.("missions");
-      } else if (a.type === "enableAutoPilot") {
+      else if (a.type === "enableAutoPilot") {
         onAutoPilot?.(a.strategy, Number(a.cap) || 5);
       }
 
@@ -167,9 +166,12 @@ export function AgentChat({
     <Panel
       label="Forge Guardian"
       right={
-        <span className="flex items-center gap-1.5 text-[11px] text-dim">
+        <span
+          className="flex items-center gap-1.5 text-[11px] text-dim"
+          title="The guardian is ready to chat and prepare transactions you sign."
+        >
           <span className="h-1.5 w-1.5 rounded-full bg-gain animate-pulse-ember" />
-          online
+          ready
         </span>
       }
       className="flex h-full flex-col"
@@ -256,7 +258,7 @@ export function AgentChat({
 
 const CAPS = [
   { icon: ShieldCheck, title: "Audit your stack", desc: "Check if you're on pace for the halving", prompt: "How safe is my stack, and am I on pace for the halving?" },
-  { icon: TrendingUp, title: "Switch modes", desc: "Move Stack ↔ Grow, on-chain", prompt: "Should I switch to Grow?" },
+  { icon: TrendingUp, title: "Switch modes", desc: "Move between Stack and Grow, on-chain", prompt: "Should I switch to Grow?" },
   { icon: Target, title: "Set a halving goal", desc: "Target a zkLTC balance", prompt: "Help me set a sensible halving goal." },
   { icon: Bot, title: "Go autonomous", desc: "Delegate to a 24/7 keeper", prompt: "Set up Auto-Pilot to compound for me." },
 ] as const;

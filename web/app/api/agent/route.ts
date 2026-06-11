@@ -2,10 +2,9 @@ import { createPublicClient, http, formatEther, isAddress, zeroAddress, type Add
 import { generateText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { liteforge } from "@/lib/chains";
-import { forgeVaultAbi, forgeProfileAbi } from "@/lib/abi";
-import { VAULT_ADDRESS, PROFILE_ADDRESS, isVaultDeployed, isProfileDeployed } from "@/lib/contracts";
+import { forgeVaultAbi } from "@/lib/abi";
+import { VAULT_ADDRESS, isVaultDeployed } from "@/lib/contracts";
 import type { AgentAction, TraceStep } from "@/lib/agent";
-import { MISSIONS } from "@/lib/missions";
 import { HALVING_LABEL } from "@/lib/halving";
 import { rateLimit, clientIp, originAllowed } from "@/lib/ratelimit";
 
@@ -53,60 +52,28 @@ async function readState(user: Address): Promise<State | null> {
   }
 }
 
-async function readMissions(user: Address) {
-  if (!isProfileDeployed || user === zeroAddress) return null;
-  try {
-    const d = (await publicClient.readContract({
-      address: PROFILE_ADDRESS,
-      abi: forgeProfileAbi,
-      functionName: "profileOf",
-      args: [user],
-    })) as readonly [bigint, bigint, bigint, readonly boolean[], readonly boolean[]];
-    return {
-      xp: Number(d[0]),
-      level: Number(d[1]),
-      claimedCount: Number(d[2]),
-      missions: MISSIONS.map((m, i) => ({
-        id: m.id,
-        name: m.name,
-        met: d[3][i] ?? false,
-        claimed: d[4][i] ?? false,
-        claimable: (d[3][i] ?? false) && !(d[4][i] ?? false),
-      })),
-    };
-  } catch {
-    return null;
-  }
-}
-
-const MISSION_LIST = MISSIONS.map((m) => `${m.id}=${m.name} (${m.desc}, +${m.xp}XP)`).join("; ");
-
 const SYSTEM = `You are Forge Guardian, an on-chain AI agent that manages a user's zkLTC smart vault on LiteForge (Litecoin's EVM testnet).
 
 The vault has two modes:
 - Stack: zkLTC held safely in the vault.
 - Grow: zkLTC deployed to a yield strategy earning a SIMULATED ~5% APY (paid from a testnet reward pool; principal is always custodied 1:1). Always be honest that testnet yield is simulated.
 
-The user is stacking toward the next Litecoin halving (around ${HALVING_LABEL}). You help them set a goal, stay on pace, deposit, switch modes, and optionally complete missions or run Auto-Pilot.
-
-Missions (id=name): ${MISSION_LIST}.
+The user is stacking toward the next Litecoin halving (around ${HALVING_LABEL}). You help them set a goal, stay on pace, deposit, switch modes, and optionally run Auto-Pilot.
 
 Auto-Pilot runs autonomously on a timer and acts on-chain (the user still confirms each tx): "compound" auto-claims yield past a threshold; "dca" deposits a fixed amount on a schedule with a session spend cap.
 
 Rules:
-- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections. Never guess numbers. Call getMissions before discussing missions/XP.
+- ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections. Never guess numbers.
 - To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet; you never move funds yourself. After proposing, tell the user to confirm.
-- Only propose claiming a mission that getMissions shows as met and not already done.
 - A goal must exceed the user's current balance.
 
 Voice (important, the user is picky about this):
 - Talk like a sharp, friendly human analyst, not a product tour or a salesperson. Plain sentences, real numbers, zkLTC to ~2 decimals.
 - Keep replies to 2-4 sentences, even for open questions like "how do I get started": give a quick orientation and suggest ONE concrete first step, never a 5-step checklist.
 - Never use an em-dash, en-dash, or a spaced hyphen to join clauses or as a bullet. Write separate sentences, or use commas or parentheses.
-- Do not use numbered lists, bullet points, or bold section headers unless the user explicitly asks for a list. No emoji.
-- Don't oversell XP, missions, or the leaderboard. Mention them only when they're genuinely relevant to what was asked.`;
+- Do not use numbered lists, bullet points, or bold section headers unless the user explicitly asks for a list. No emoji.`;
 
-function buildTools(getState: () => Promise<State | null>, user: Address, actions: AgentAction[]) {
+function buildTools(getState: () => Promise<State | null>, actions: AgentAction[]) {
   return {
     getVaultState: tool({
       description:
@@ -154,20 +121,6 @@ function buildTools(getState: () => Promise<State | null>, user: Address, action
         return { prepared: true };
       },
     }),
-    getMissions: tool({
-      description: "Read which missions the user has met (claimable) and already completed, plus XP and level.",
-      inputSchema: z.object({}),
-      execute: async () => (await readMissions(user)) ?? { note: "Profile not deployed or wallet not connected." },
-    }),
-    proposeClaimMission: tool({
-      description: `Prepare claiming a mission by id. Ids: ${MISSION_LIST}. Only claim ones getMissions shows met and not done.`,
-      inputSchema: z.object({ missionId: z.number().int().min(0).max(MISSIONS.length - 1) }),
-      execute: async ({ missionId }) => {
-        const m = MISSIONS[missionId];
-        actions.push({ type: "claimMission", missionId, label: `Claim "${m?.name ?? `#${missionId}`}"` });
-        return { prepared: true };
-      },
-    }),
     proposeAutoPilot: tool({
       description:
         "Configure the autonomous Auto-Pilot. strategy 'compound' auto-claims yield; 'dca' auto-deposits on a schedule; 'off' disables. cap = session spend cap in zkLTC.",
@@ -200,16 +153,6 @@ function traceStepForTool(name: string, input: Record<string, unknown>, output: 
         label: "Read live vault state",
         detail: typeof out.total === "number" ? summarizeState(out as unknown as State) : (out.note as string),
       };
-    case "getMissions": {
-      const claimable = Array.isArray(out.missions)
-        ? (out.missions as { claimable?: boolean }[]).filter((m) => m.claimable).length
-        : 0;
-      return {
-        kind: "read",
-        label: "Read missions & XP",
-        detail: typeof out.level === "number" ? `L${out.level} · ${out.xp} XP · ${claimable} claimable` : (out.note as string),
-      };
-    }
     case "proposeDeposit":
       return { kind: "prepare", label: `Prepared: deposit ${input.amount} zkLTC` };
     case "proposeWithdraw":
@@ -220,8 +163,6 @@ function traceStepForTool(name: string, input: Record<string, unknown>, output: 
       return { kind: "prepare", label: `Prepared: set goal ${input.amount} zkLTC` };
     case "proposeClaimYield":
       return { kind: "prepare", label: "Prepared: claim yield" };
-    case "proposeClaimMission":
-      return { kind: "prepare", label: `Prepared: claim mission #${input.missionId}` };
     case "proposeAutoPilot":
       return { kind: "prepare", label: `Prepared: Auto-Pilot ${input.strategy}` };
     default:
@@ -335,7 +276,7 @@ export async function POST(request: Request) {
             "\n\nDEMO MODE: the vault state you can read is sample/demo data, not real on-chain balances. Help the user explore, but never imply these are their actual funds or that real value is at stake."
           : SYSTEM,
         messages,
-        tools: buildTools(getState, user, actions),
+        tools: buildTools(getState, actions),
         stopWhen: stepCountIs(6),
       });
       // De-AI the model output before returning: em/en-dashes AND spaced-hyphen separators both
@@ -348,7 +289,7 @@ export async function POST(request: Request) {
   }
 
   const trace: TraceStep[] = [];
-  const fallback = await rulesEngine(messages, getState, user, actions, trace);
+  const fallback = await rulesEngine(messages, getState, actions, trace);
   for (const a of actions) trace.push({ kind: "prepare", label: a.label });
   return Response.json({ ...fallback, actions, trace, engine: "rules" });
 }
@@ -357,7 +298,6 @@ export async function POST(request: Request) {
 async function rulesEngine(
   messages: { role: string; content: string }[],
   getState: () => Promise<State | null>,
-  user: Address,
   actions: AgentAction[],
   trace: TraceStep[]
 ): Promise<{ text: string }> {
@@ -389,20 +329,6 @@ async function rulesEngine(
           ? `Enabling Auto-DCA with a ${cap} zkLTC session cap. I'll deposit on a schedule (you confirm each tx).`
           : `Enabling Auto-Compound. I'll auto-claim your yield once it builds up (you confirm each tx).`,
     };
-  }
-  // Missions before the generic claim branch - "claim a mission" contains "claim".
-  if (/mission|quest|\bxp\b|badge|achievement|level/.test(t)) {
-    const m = await readMissions(user);
-    if (!m) return { text: "Connect your wallet and open the Missions tab to start earning XP toward the leaderboard." };
-    const claimable = m.missions.filter((x) => x.claimable);
-    if (claimable.length === 0) {
-      return { text: `You're level ${m.level} with ${m.xp} XP (${m.claimedCount}/${MISSIONS.length} missions). Nothing new to claim. Keep stacking.` };
-    }
-    for (const c of claimable) actions.push({ type: "claimMission", missionId: c.id, label: `Claim "${c.name}"` });
-    return { text: `You can claim ${claimable.length} mission${claimable.length > 1 ? "s" : ""}: ${claimable.map((c) => c.name).join(", ")}. Confirm in your wallet.` };
-  }
-  if (/leaderboard|rank|standing|top stacker/.test(t)) {
-    return { text: "Open the Leaderboard tab. You're ranked against every stacker by XP, balance, goal progress, and yield." };
   }
   // Claim (yield) must be checked before the Grow branch - "claim my yield" contains "yield".
   if (/\bclaim\b/.test(t)) {
@@ -466,6 +392,6 @@ async function rulesEngine(
     return { text: `The next Litecoin halving is ~${s ? s.daysToHalving : "-"} days out (est. ${HALVING_LABEL}). Stack hard until then.` };
   }
   return {
-    text: "I'm your vault guardian. Ask me to check your stack, switch modes, set a goal, deposit/withdraw, claim missions, or run Auto-Pilot.",
+    text: "I'm your vault guardian. Ask me to check your stack, switch modes, set a goal, deposit, withdraw, or run Auto-Pilot.",
   };
 }

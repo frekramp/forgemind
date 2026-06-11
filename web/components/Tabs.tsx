@@ -3,18 +3,9 @@
 import { cn } from "@/lib/cn";
 import { LayoutDashboard, Bot, BrainCircuit, type LucideIcon } from "lucide-react";
 
-export type TabKey =
-  | "overview"
-  | "leaderboard"
-  | "activity"
-  | "missions"
-  | "analytics"
-  | "autopilot"
-  | "decisions";
+export type TabKey = "overview" | "decisions" | "autopilot";
 
-// Focused, agent-first nav - just the three surfaces that tell the AI-agent story.
-// Missions / Leaderboard / Activity / Analytics still exist as components (Dashboard can
-// still render them); add a line back here to resurface one in the tab bar.
+// Focused, agent-first nav: the three surfaces that tell the on-chain AI-agent story.
 const TABS: { key: TabKey; label: string; icon: LucideIcon }[] = [
   { key: "overview", label: "Overview", icon: LayoutDashboard },
   { key: "decisions", label: "Decisions", icon: BrainCircuit },
@@ -38,7 +29,7 @@ export function Tabs({ active, onChange }: { active: TabKey; onChange: (t: TabKe
             )}
           >
             <Icon size={15} />
-            <span className="hidden sm:inline">{label}</span>
+            <span>{label}</span>
           </button>
         );
       })}

@@ -1,6 +1,8 @@
 # ForgeMind 🔥
 
-**An AI guardian for your zkLTC stack - on LiteForge.**
+**A truly agentic AI for your zkLTC stack, on LiteForge.**
+
+**▶ Live:** https://forgemindapp.xyz  ·  **30-second demo (no wallet):** https://forgemindapp.xyz/?demo=1
 
 ForgeMind is an AI-powered smart vault for **zkLTC** on [LiteForge](https://www.litvm.com/) (Litecoin's EVM testnet, chain `4441`). Deposit zkLTC, then **chat with an on-chain agent that executes real transactions** - switch between safe **Stack** mode and yield-bearing **Grow** mode, set a **Litecoin-halving goal**, and watch your projected stack.
 
@@ -9,6 +11,8 @@ Built for the **LiteForge Hackathon - AI Agents & Agentic Apps track**.
 > **▶ Try it in 30s - no wallet:** open the deployed app and append **`?demo=1`** (or hit **Explore live demo** on the landing page) to walk the full dashboard, chat with the Guardian, and inspect the on-chain **Decisions** ledger - all on clearly-labelled sample data. A guided judge walkthrough lives in **[DEMO.md](DEMO.md)**.
 
 > Most "AI agent" entries are chatbots that only talk. ForgeMind's agent reads live on-chain state, **shows its reasoning step-by-step**, **prepares real transactions you sign in your wallet**, and **writes every decision on-chain** - deposit, withdraw, switch mode, set goal, claim yield.
+
+**How it works (the agentic loop):** **Reads** your on-chain vault → **Reasons** step by step (and shows its work) → **Acts** through transactions you sign → **Records** every decision on-chain. You stay in control the whole way; it never holds your keys.
 
 ---
 
@@ -21,6 +25,7 @@ Built for the **LiteForge Hackathon - AI Agents & Agentic Apps track**.
 - **Notarizes decisions on-chain**: each action is recorded in **`ForgeActionLog`** with the engine that decided it (Claude vs. rule-based) and a reason - a verifiable "why", paired with the vault's record of "what". See the **Decisions** tab.
 - **Multi-step tool use** (Vercel AI SDK + Claude Haiku 4.5) - e.g. _"am I on pace?"_ → reads state → computes projection → recommends switching to Grow → prepares the `setMode` tx.
 - **Autonomous Auto-Pilot**: opt-in compound/DCA rules act on a timer (you still sign), each one notarized on-chain.
+- **Autonomous keeper (on-chain delegation)**: grant a capped, revocable on-chain authorization and a server-side keeper auto-compounds and rebalances for you 24/7 - no browser, no per-tx clicks. Its moves are signed by the agent key and verified on-chain.
 - **Deterministic fallback**: with no model key set, a rule-based engine drives the exact same tools, so the demo never breaks.
 
 > **The only true agentic app in its track.** Competing "AI" entries are data/MCP servers or pure DeFi protocols; ForgeMind is the one that actually *reads, reasons, acts, and records* on LitVM - and it's wired to the **hard-money** thesis: stacking sound money toward the Litecoin halving.
@@ -42,7 +47,7 @@ Built for the **LiteForge Hackathon - AI Agents & Agentic Apps track**.
 
 ```
 forgemind/
-├── contracts/                 # Foundry (Solidity 0.8.24) - 54 passing tests
+├── contracts/                 # Foundry (Solidity 0.8.24) - 75 passing tests
 │   ├── src/ForgeVault.sol            # native-zkLTC vault: deposit/withdraw(All), modes, halving goal, projection
 │   ├── src/MockYieldStrategy.sol     # simulated-yield backend (reward pool, linear APR, pro-rata payout)
 │   ├── src/ForgeProfile.sol          # missions → XP → levels, usernames, leaderboard registry
@@ -52,7 +57,7 @@ forgemind/
 │   └── script/Deploy.s.sol           # deploys + wires + seeds reward pool
 └── web/                       # Next.js 16 (App Router) + TypeScript
     ├── app/api/agent/route.ts        # the AI agent: tools + Claude + rule-based fallback + reasoning trace
-    ├── components/                   # Dashboard, VaultPanel, AgentChat, AgentDecisions, AutoPilot, Missions…
+    ├── components/                   # Dashboard, VaultPanel, AgentChat, AgentDecisions, AutoPilot, KeeperPanel…
     ├── hooks/                        # useVault, useActionLog, useAutoPilot, useMissions, useLeaderboard
     └── lib/                          # chain (4441), abi, halving math, insight, action-log enums, formatters
 ```
@@ -62,7 +67,7 @@ forgemind/
 ### Contracts
 | Contract | Role |
 |---|---|
-| `ForgeVault` | Custody, Stack/Grow modes, halving goal, projection, TVL + user registry. `withdrawAll()` exits principal + yield in one tx; `setStrategy` is guarded so a swap can't orphan Grow funds. |
+| `ForgeVault` | Custody, Stack/Grow modes, halving goal, projection, TVL + user registry. `withdrawAll()` exits principal + yield in one tx; `setStrategy` is guarded so a swap can't orphan Grow funds. Keeper hooks (`authorizeAgent`/`revokeAgent`/`agentClaimYield`) let a capped, revocable server keeper act for opted-in users. |
 | `MockYieldStrategy` | Simulated 5% APY from a pre-funded reward pool; partial withdrawals pay a **pro-rata** share of accrued yield. |
 | `ForgeProfile` | On-chain missions, XP/levels, usernames, leaderboard registry. |
 | `ForgeActionLog` | Tamper-evident ledger of agent decisions (Kind + Engine + reason); attested entries carry a trusted-signer signature verified on-chain in `logAttested`. |
@@ -74,7 +79,7 @@ forgemind/
 ### 1. Contracts (Foundry)
 ```bash
 cd contracts
-forge test                      # 54 tests passing
+forge test                      # 75 tests passing
 cp .env.example .env            # add your funded testnet PRIVATE_KEY
 forge script script/Deploy.s.sol:Deploy --rpc-url liteforge --broadcast
 # note the printed ForgeVault / MockYieldStrategy / ForgeProfile / ForgeActionLog addresses

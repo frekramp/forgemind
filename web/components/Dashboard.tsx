@@ -19,7 +19,7 @@ import { AgentDecisions } from "./AgentDecisions";
 import { useDemoMode } from "./DemoProvider";
 import { isVaultDeployed } from "@/lib/contracts";
 import { countdownTo, type Countdown } from "@/lib/halving";
-import { ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap } from "lucide-react";
+import { ShieldCheck, TrendingUp, Bot, TriangleAlert, Wallet, Play, X, Sparkles, Link2, Zap, Eye, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useEffect } from "react";
 
@@ -357,8 +357,55 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
             </div>
           ))}
         </div>
+
+        <HowItWorks onDemo={onDemo} />
       </div>
     </section>
+  );
+}
+
+const STEPS = [
+  { icon: Eye, title: "Reads", desc: "Pulls your live on-chain vault state through a single view call." },
+  { icon: BrainCircuit, title: "Reasons", desc: "Thinks step by step and shows its work, the exact tools it called." },
+  { icon: Zap, title: "Acts", desc: "Prepares a real transaction you sign. It never holds your keys." },
+  { icon: ShieldCheck, title: "Records", desc: "Notarizes every decision on-chain, cryptographically verifiable." },
+] as const;
+
+/** Landing "How it works": the agentic loop made concrete, with a path straight into the demo. */
+function HowItWorks({ onDemo }: { onDemo: () => void }) {
+  return (
+    <div className="animate-rise-in mt-20 w-full max-w-4xl" style={{ animationDelay: "380ms" }}>
+      <div className="text-center">
+        <span className="label text-ember">How it works</span>
+        <h2 className="font-display mt-2 text-[1.9rem] leading-tight tracking-tight">The agentic loop, on-chain.</h2>
+        <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-muted">
+          Every move the Forge Guardian makes follows the same four steps. You stay in control the whole way: it never
+          holds your keys.
+        </p>
+      </div>
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {STEPS.map((s, i) => (
+          <div key={s.title} className="lift rounded-2xl border border-border bg-panel p-5 text-left">
+            <div className="flex items-center justify-between">
+              <span className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-bg text-ember">
+                <s.icon size={17} />
+              </span>
+              <span className="tnum font-mono text-[11px] text-dim">0{i + 1}</span>
+            </div>
+            <div className="mt-3 text-sm font-semibold">{s.title}</div>
+            <p className="mt-1 text-xs leading-relaxed text-muted">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-7 flex justify-center">
+        <button
+          onClick={onDemo}
+          className="flex items-center gap-2 rounded-xl bg-ember px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
+        >
+          <Play size={14} /> See it live in the demo
+        </button>
+      </div>
+    </div>
   );
 }
 

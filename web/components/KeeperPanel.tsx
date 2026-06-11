@@ -137,6 +137,13 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
           </Button>
         </div>
 
+        <p className="text-[11px] leading-relaxed text-dim">
+          <span className="text-muted">Delegate to keeper</span> grants the on-chain permission once, then the keeper
+          runs on its own schedule with no further clicks. <span className="text-muted">Run keeper now</span> just fires
+          one cycle immediately so you can watch it act. <span className="text-muted">Revoke</span> ends the permission
+          anytime.
+        </p>
+
         {!canDelegate && (
           <div className="flex items-start gap-2 rounded-lg border border-border bg-bg px-3 py-2 text-[11px] leading-relaxed text-dim">
             <ShieldCheck size={13} className="mt-0.5 shrink-0 text-ember" />

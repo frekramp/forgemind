@@ -73,7 +73,7 @@ export function Dashboard() {
                 <ErrorBoundary label="this view">{renderTab()}</ErrorBoundary>
               </div>
               <div className="lg:col-span-5 xl:col-span-4">
-                <div className="h-[660px] lg:sticky lg:top-20">
+                <div className="h-[660px] lg:sticky lg:top-20 lg:h-[calc(100dvh-13rem)] lg:max-h-[780px]">
                   <ErrorBoundary label="the agent">
                     <AgentChat
                       v={v}

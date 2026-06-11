@@ -123,8 +123,22 @@ export function useAutoPilot(v: ReturnType<typeof useVault>, record?: ActionLog[
     // wallet prompt on a real wallet; instant on the demo), then continue on schedule. The in-flight
     // guard, 30s cooldown, and DCA interval below still block any rapid re-fire.
     lastActionAt.current = 0;
-    if (cfgRef.current.strategy === "dca") lastDcaAt.current = 0;
-    pushLog(cfgRef.current.strategy === "dca" ? "Auto-DCA started." : "Auto-Compound started.");
+    // Tell the user what will happen the moment they press Start, so a legitimate no-op (e.g.
+    // Auto-Compound while in Stack mode, or no yield yet) reads as "watching", not "broken".
+    const sc = cfgRef.current;
+    const ss = vRef.current.state;
+    if (sc.strategy === "dca") {
+      lastDcaAt.current = 0;
+      pushLog(`Auto-DCA on. Depositing ${sc.dcaAmount} zkLTC now, then every ${sc.dcaIntervalMin} min (cap ${sc.cap}).`);
+    } else if (!vRef.current.isConnected || !ss) {
+      pushLog("Auto-Compound on. Connect a wallet with a Grow position and I'll claim yield as it builds.");
+    } else if (ss.mode !== Mode.Grow) {
+      pushLog("Auto-Compound on, but you're in Stack mode so no yield accrues. Switch to Grow and I'll claim it as it builds.");
+    } else if (ss.pendingYield < sc.claimThreshold) {
+      pushLog(`Auto-Compound on. Nothing to claim yet (${ss.pendingYield.toFixed(4)} < ${sc.claimThreshold} zkLTC). I'll claim automatically once it crosses.`);
+    } else {
+      pushLog(`Auto-Compound on. Claiming ${ss.pendingYield.toFixed(4)} zkLTC now.`);
+    }
 
     const tick = async () => {
       if (inFlight.current) return;

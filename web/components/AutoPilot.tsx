@@ -54,9 +54,15 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
           </div>
 
           {config.strategy === "compound" && (
-            <Field label="Claim when yield ≥ (zkLTC)">
-              <NumberInput value={config.claimThreshold} onChange={(n) => setConfig({ claimThreshold: n })} step="0.01" />
-            </Field>
+            <div className="space-y-1.5">
+              <Field label="Claim when yield ≥ (zkLTC)">
+                <NumberInput value={config.claimThreshold} onChange={(n) => setConfig({ claimThreshold: n })} step="0.01" />
+              </Field>
+              <p className="text-[11px] leading-relaxed text-dim">
+                Only fires while you&apos;re in Grow mode and accrued yield crosses this. In Stack mode there&apos;s no
+                yield to claim, so nothing happens until you switch to Grow.
+              </p>
+            </div>
           )}
 
           {config.strategy === "dca" && (

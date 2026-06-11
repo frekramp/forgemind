@@ -12,7 +12,6 @@ import {
 import { useDemoMode } from "@/components/DemoProvider";
 import { demoDecisions, makeDemoDecision } from "@/lib/demo";
 
-const NOTARIZE_KEY = "forgemind.notarize";
 const MAX_REASON = 160; // matches ForgeActionLog.MAX_REASON (bytes)
 
 type RawDecision = {
@@ -32,9 +31,8 @@ type RawDecision = {
 
 /**
  * Reads the on-chain agent-decision ledger (via /api/decisions, which enriches each entry
- * with its on-chain tx + the vault tx it settled) and lets the agent notarize a decision.
- * "Notarize" is a separate, user-signed tx (honest, non-custodial) recording WHY an action
- * was taken; it can be toggled off for users who don't want the extra confirm.
+ * with its on-chain tx + the vault tx it settled) and notarizes each agent decision: a separate,
+ * user-signed tx (honest, non-custodial) recording WHY an action was taken.
  */
 export function useActionLog() {
   const decisions = useQuery({
@@ -67,27 +65,6 @@ export function useActionLog() {
     }));
   }, [decisions.data]);
 
-  // notarize toggle (persisted; default on so the demo shows the on-chain trail)
-  const [notarize, setNotarizeState] = useState(true);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(NOTARIZE_KEY);
-      // SSR-safe hydration: read persisted preference once after mount.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw !== null) setNotarizeState(raw === "1");
-    } catch {
-      /* ignore */
-    }
-  }, []);
-  const setNotarize = useCallback((on: boolean) => {
-    setNotarizeState(on);
-    try {
-      localStorage.setItem(NOTARIZE_KEY, on ? "1" : "0");
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
   const { writeContractAsync } = useWriteContract();
   const [hash, setHash] = useState<`0x${string}` | undefined>();
   const { isSuccess } = useWaitForTransactionReceipt({ hash });
@@ -109,7 +86,7 @@ export function useActionLog() {
    */
   const record = useCallback(
     async (kind: ActionKind, engine: ActionEngine, amountWei: bigint, reason: string) => {
-      if (!isActionLogDeployed || !notarize) return undefined;
+      if (!isActionLogDeployed) return undefined;
       const safeReason = reason.length > MAX_REASON ? reason.slice(0, MAX_REASON) : reason;
       const h = await writeContractAsync({
         ...actionLogContract,
@@ -119,7 +96,7 @@ export function useActionLog() {
       setHash(h);
       return h;
     },
-    [notarize, writeContractAsync]
+    [writeContractAsync]
   );
 
   // In demo mode the Decisions ledger is a live, in-memory store: notarizing a demo action
@@ -127,11 +104,10 @@ export function useActionLog() {
   const [demoLog, setDemoLog] = useState<DecisionEntry[]>(demoDecisions);
   const demoRecord = useCallback(
     async (kind: ActionKind, engine: ActionEngine, amountWei: bigint, reason: string): Promise<undefined> => {
-      if (!notarize) return undefined; // honor the Notarize toggle, same as the on-chain path
       setDemoLog((l) => [makeDemoDecision(kind, engine, amountWei, reason), ...l].slice(0, 60));
       return undefined;
     },
-    [notarize]
+    []
   );
 
   const { isDemo } = useDemoMode();
@@ -144,8 +120,6 @@ export function useActionLog() {
       entries: demoLog,
       isLoading: false,
       deployed: true,
-      notarize,
-      setNotarize,
       record: demoRecord,
       refetch: noop,
     };
@@ -155,8 +129,6 @@ export function useActionLog() {
     entries,
     isLoading: decisions.isLoading,
     deployed: isActionLogDeployed,
-    notarize,
-    setNotarize,
     record,
     refetch: decisions.refetch,
   };

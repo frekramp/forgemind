@@ -57,35 +57,18 @@ function ago(tsSec: number): string {
 export function AgentDecisions({ al }: { al: ActionLog }) {
   // `deployed` comes from the hook: true on a real deployment AND in demo mode (where it
   // serves demoDecisions). Gating on the static contract flag would blank the demo.
-  const { entries, isLoading, deployed, notarize, setNotarize } = al;
+  const { entries, isLoading, deployed } = al;
 
   return (
     <Panel
       label="Agent Decisions"
       right={
-        <label
-          className="flex cursor-pointer items-center gap-2 text-[11px] text-dim"
-          title="Write each agent decision on-chain as a verifiable record. Adds one extra wallet confirm per action; on by default."
+        <span
+          className="flex items-center gap-1.5 text-[11px] font-medium text-gain"
+          title="Every decision here is written on-chain as a verifiable record."
         >
-          <span>Notarize on-chain</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={notarize}
-            onClick={() => setNotarize(!notarize)}
-            className={cn(
-              "relative h-5 w-9 shrink-0 rounded-full transition-colors",
-              notarize ? "bg-ember" : "bg-border-strong"
-            )}
-          >
-            <span
-              className={cn(
-                "absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ease-out",
-                notarize ? "translate-x-4" : "translate-x-0"
-              )}
-            />
-          </button>
-        </label>
+          <ShieldCheck size={12} /> Notarized on-chain
+        </span>
       }
     >
       <div className="space-y-3">

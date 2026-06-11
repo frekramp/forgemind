@@ -6,6 +6,7 @@ import { forgeVaultAbi, forgeProfileAbi } from "@/lib/abi";
 import { VAULT_ADDRESS, PROFILE_ADDRESS, isVaultDeployed, isProfileDeployed } from "@/lib/contracts";
 import type { AgentAction, TraceStep } from "@/lib/agent";
 import { MISSIONS } from "@/lib/missions";
+import { HALVING_LABEL } from "@/lib/halving";
 import { rateLimit, clientIp, originAllowed } from "@/lib/ratelimit";
 
 export const maxDuration = 30;
@@ -86,7 +87,7 @@ The vault has two modes:
 - Stack: zkLTC held safely in the vault.
 - Grow: zkLTC deployed to a yield strategy earning a SIMULATED ~5% APY (paid from a testnet reward pool; principal is always custodied 1:1). Always be honest that testnet yield is simulated.
 
-The user is stacking toward the next Litecoin halving (~August 2027). You help them set a goal, stay on pace, complete missions, climb the leaderboard, and optionally run Auto-Pilot.
+The user is stacking toward the next Litecoin halving (around ${HALVING_LABEL}). You help them set a goal, stay on pace, deposit, switch modes, and optionally complete missions or run Auto-Pilot.
 
 Missions (id=name): ${MISSION_LIST}.
 
@@ -94,10 +95,16 @@ Auto-Pilot runs autonomously on a timer and acts on-chain (the user still confir
 
 Rules:
 - ALWAYS call getVaultState before answering anything about balances, safety, pace, or projections. Never guess numbers. Call getMissions before discussing missions/XP.
-- To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet - you never move funds yourself. After proposing, tell the user to confirm.
+- To take an action, call the matching propose* tool. This PREPARES something the user confirms in their own wallet; you never move funds yourself. After proposing, tell the user to confirm.
 - Only propose claiming a mission that getMissions shows as met and not already done.
-- Be concise, sharp, and friendly. Use real numbers. 2-4 sentences. zkLTC amounts to ~2 decimals.
-- A goal must exceed the user's current balance.`;
+- A goal must exceed the user's current balance.
+
+Voice (important, the user is picky about this):
+- Talk like a sharp, friendly human analyst, not a product tour or a salesperson. Plain sentences, real numbers, zkLTC to ~2 decimals.
+- Keep replies to 2-4 sentences, even for open questions like "how do I get started": give a quick orientation and suggest ONE concrete first step, never a 5-step checklist.
+- Never use an em-dash, en-dash, or a spaced hyphen to join clauses or as a bullet. Write separate sentences, or use commas or parentheses.
+- Do not use numbered lists, bullet points, or bold section headers unless the user explicitly asks for a list. No emoji.
+- Don't oversell XP, missions, or the leaderboard. Mention them only when they're genuinely relevant to what was asked.`;
 
 function buildTools(getState: () => Promise<State | null>, user: Address, actions: AgentAction[]) {
   return {
@@ -262,6 +269,17 @@ function sanitizeState(x: unknown): State | null {
   };
 }
 
+// Convert "AI tells" in model prose (em/en-dashes and spaced-hyphen separators) into commas, so
+// replies don't read machine-written. Cleans up any doubled or leading commas the swap creates.
+function deAiText(s: string): string {
+  return s
+    .replace(/\s*[—–]\s*/g, ", ")
+    .replace(/ +- +/g, ", ")
+    .replace(/\s*,\s*,/g, ", ")
+    .replace(/^\s*,\s*/, "")
+    .trim();
+}
+
 export async function POST(request: Request) {
   // Block cross-site drive-by calls, then cap request volume per IP so a public URL can't
   // burn the LLM budget. (Per-request input is already bounded below.)
@@ -320,8 +338,9 @@ export async function POST(request: Request) {
         tools: buildTools(getState, user, actions),
         stopWhen: stepCountIs(6),
       });
-      // Strip em/en-dashes from the live model output (a common "AI" tell) before returning.
-      const text = (result.text?.trim() || "Done. Check the dashboard.").replace(/[—–]/g, "-");
+      // De-AI the model output before returning: em/en-dashes AND spaced-hyphen separators both
+      // read as machine-written (the user dislikes them). Convert them to commas, not hyphens.
+      const text = deAiText(result.text?.trim() || "Done. Check the dashboard.");
       return Response.json({ text, actions, trace: traceFromSteps(result.steps), engine: "claude" });
     } catch (err) {
       console.error("LLM agent error, falling back to rules:", err);
@@ -444,7 +463,7 @@ async function rulesEngine(
     };
   }
   if (/halving|countdown|when/.test(t)) {
-    return { text: `The next Litecoin halving is ~${s ? s.daysToHalving : "-"} days out (est. Aug 2027). Stack hard until then.` };
+    return { text: `The next Litecoin halving is ~${s ? s.daysToHalving : "-"} days out (est. ${HALVING_LABEL}). Stack hard until then.` };
   }
   return {
     text: "I'm your vault guardian. Ask me to check your stack, switch modes, set a goal, deposit/withdraw, claim missions, or run Auto-Pilot.",

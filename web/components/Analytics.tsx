@@ -45,7 +45,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Mini label="Stack mode" desc="Principal held 1:1, fully custodied and withdrawable anytime." />
             <Mini label="Grow mode" desc="Principal deployed to a yield strategy earning simulated 5% APY." />
-            <Mini label="Halving goal" desc="Each stacker targets a zkLTC balance before the ~Aug 2027 halving." />
+            <Mini label="Halving goal" desc="Each stacker targets a zkLTC balance before the Jul 2027 halving." />
           </div>
           {!deployed && (
             <p className="text-[11px] text-dim">

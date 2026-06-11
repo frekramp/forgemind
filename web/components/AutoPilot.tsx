@@ -18,7 +18,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
         right={
           <span className={cn("flex items-center gap-1.5 text-[11px]", enabled ? "text-gain" : config.strategy !== "off" ? "text-ember" : "text-dim")}>
             <span className={cn("h-1.5 w-1.5 rounded-full", enabled ? "bg-gain animate-pulse-ember" : config.strategy !== "off" ? "bg-ember" : "bg-dim")} />
-            {enabled ? "active" : config.strategy !== "off" ? "paused" : "idle"}
+            {enabled ? "active" : config.strategy !== "off" ? "ready" : "idle"}
           </span>
         }
       >
@@ -88,7 +88,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
                 </span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-bg">
-                <div className="h-full bg-ember" style={{ width: `${Math.min(100, (spent / config.cap) * 100)}%` }} />
+                <div className="h-full bg-ember" style={{ width: `${config.cap > 0 ? Math.min(100, (spent / config.cap) * 100) : 0}%` }} />
               </div>
             </div>
           )}
@@ -119,7 +119,7 @@ export function AutoPilot({ ap }: { ap: ReturnType<typeof useAutoPilot> }) {
         </div>
       </Panel>
 
-      <Panel label="Action Log">
+      <Panel label="Auto-Pilot activity">
         {log.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-10 text-center">
             <Bot size={20} className="text-dim" />

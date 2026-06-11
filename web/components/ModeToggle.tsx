@@ -15,7 +15,7 @@ export function ModeToggle({
 }) {
   const opts = [
     { m: Mode.Stack, label: "Stack", icon: Shield, desc: "Hold safely" },
-    { m: Mode.Grow, label: "Grow", icon: TrendingUp, desc: "Earn 5% APY" },
+    { m: Mode.Grow, label: "Grow", icon: TrendingUp, desc: "Earn a simulated 5% APY" },
   ] as const;
 
   return (

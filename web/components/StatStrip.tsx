@@ -8,7 +8,7 @@ import { daysToHalving } from "@/lib/halving";
 import type { useVault } from "@/hooks/useVault";
 import { Coins, Shield, TrendingUp, Clock, Sparkles, type LucideIcon } from "lucide-react";
 
-type Item = { label: string; value: string; unit: string; Icon: LucideIcon; accent: boolean };
+type Item = { label: string; value: string; unit: string; Icon: LucideIcon; accent: boolean; hint?: string };
 
 export function StatStrip({ v }: { v: ReturnType<typeof useVault> }) {
   const s = v.state;
@@ -18,17 +18,48 @@ export function StatStrip({ v }: { v: ReturnType<typeof useVault> }) {
   const days = s?.daysToHalving || daysToHalving();
 
   const items: Item[] = [
-    { label: "Vault balance", value: fmtNum(total, 4), unit: "zkLTC", Icon: Coins, accent: true },
-    { label: "Mode", value: isGrow ? "Grow" : "Stack", unit: isGrow ? "5% APY" : "safe", Icon: isGrow ? TrendingUp : Shield, accent: false },
-    { label: "Yield accruing", value: fmtNum(yieldNum, 4), unit: "zkLTC", Icon: Sparkles, accent: false },
-    { label: "Halving in", value: String(days), unit: "days", Icon: Clock, accent: false },
+    {
+      label: "Vault balance",
+      value: fmtNum(total, 4),
+      unit: "zkLTC",
+      Icon: Coins,
+      accent: true,
+      hint: "Your total zkLTC in the vault: deposited principal plus any unclaimed yield.",
+    },
+    {
+      label: "Mode",
+      value: isGrow ? "Grow" : "Stack",
+      unit: isGrow ? "earning 5% APY" : "held 1:1",
+      Icon: isGrow ? TrendingUp : Shield,
+      accent: false,
+      hint: isGrow
+        ? "Grow earns a simulated 5% APY from a testnet pool. Your principal stays custodied 1:1."
+        : "Stack holds your zkLTC 1:1, earning nothing. Switch to Grow to start earning.",
+    },
+    {
+      label: "Unclaimed yield",
+      value: fmtNum(yieldNum, 4),
+      unit: "zkLTC",
+      Icon: Sparkles,
+      accent: false,
+      hint: "Simulated yield earned so far (only grows in Grow mode). Claim it into your balance anytime.",
+    },
+    {
+      label: "Halving in",
+      value: String(days),
+      unit: "days",
+      Icon: Clock,
+      accent: false,
+      hint: "Days until the next Litecoin halving.",
+    },
   ];
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 stagger">
-      {items.map(({ label, value, unit, Icon, accent }) => (
+      {items.map(({ label, value, unit, Icon, accent, hint }) => (
         <div
           key={label}
+          title={hint}
           className={cn(
             "lift rounded-xl border bg-panel p-4",
             accent ? "border-ember/45 ring-1 ring-ember/15" : "border-border hover:border-border-strong"

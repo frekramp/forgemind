@@ -154,7 +154,7 @@ function AutomationTab({ v, ap }: { v: ReturnType<typeof useVault>; ap: ReturnTy
             icon={Zap}
             title="Keeper"
             tag="fully hands-off"
-            desc="Delegate once on-chain and a server keeper acts 24/7 — no browser, no per-tx clicks. Capped + revocable."
+            desc="Delegate once on-chain and a server keeper acts 24/7 with no browser and no per-tx clicks. Capped and revocable."
           />
         </div>
       </div>

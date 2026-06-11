@@ -51,11 +51,16 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
           ))}
         </div>
 
+        <p className="text-[11px] leading-relaxed text-dim">
+          Time until the next Litecoin halving, when mining rewards drop (historically a major catalyst). Your goal
+          targets a balance to reach by then.
+        </p>
+
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted">Progress to goal</span>
             <span className="tnum font-mono">
-              {fmtNum(currentAnim, 2)} / {goalNum > 0 ? fmtNum(goalNum, 2) : "-"}
+              {fmtNum(currentAnim, 2)} / {goalNum > 0 ? fmtNum(goalNum, 2) : "no goal"}
             </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-bg">
@@ -69,11 +74,13 @@ export function HalvingTracker({ v }: { v: ReturnType<typeof useVault> }) {
               <span className="text-muted">
                 Vault is empty. Deposit zkLTC{goalNum > 0 ? ` to start stacking toward your ${fmtNum(goalNum, goalNum < 1 ? 3 : 0)} goal` : " above to begin"}.
               </span>
-            ) : (
+            ) : goalNum > 0 ? (
               <>
                 <span>{progress.toFixed(0)}% complete</span>
-                <span>Projected (Grow): {fmtNum(projectedGrow, 2)}</span>
+                <span>Grow estimate: about {fmtNum(projectedGrow, 2)} by the halving</span>
               </>
+            ) : (
+              <span className="text-muted">No goal yet. Set a target balance below to track your pace to the halving.</span>
             )}
           </div>
         </div>

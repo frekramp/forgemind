@@ -166,7 +166,7 @@ function Row({ e }: { e: DecisionEntry }) {
             {shortAddr(e.actor)}
           </a>
           <span>·</span>
-          <span className="tnum">{e.timestamp > 0 ? `${ago(e.timestamp)} ago` : "pending"}</span>
+          <span className="tnum">{e.timestamp > 0 ? `${ago(e.timestamp)} ago` : "confirming…"}</span>
           {e.txHash && (
             <>
               <span>·</span>
@@ -174,6 +174,7 @@ function Row({ e }: { e: DecisionEntry }) {
                 href={`${explorer}/tx/${e.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                title="The on-chain record of why the agent acted."
                 className="flex items-center gap-0.5 text-ember hover:underline"
               >
                 decision <ExternalLink size={9} />
@@ -185,9 +186,10 @@ function Row({ e }: { e: DecisionEntry }) {
               href={`${explorer}/tx/${e.outcomeTx}`}
               target="_blank"
               rel="noopener noreferrer"
+              title="The vault transaction that carried out the decision."
               className="flex items-center gap-0.5 rounded border border-gain/30 bg-gain/5 px-1.5 py-0.5 text-gain hover:underline"
             >
-              <LinkIcon size={9} /> settled{e.outcomeAmount && Number(e.outcomeAmount) > 0 ? ` ${fmtNum(Number(e.outcomeAmount), 2)}` : ""}
+              <LinkIcon size={9} /> settled{e.outcomeAmount && Number(e.outcomeAmount) > 0 ? ` ${fmtNum(Number(e.outcomeAmount), 2)} zkLTC` : ""}
             </a>
           )}
         </div>

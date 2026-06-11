@@ -82,6 +82,9 @@ export function AgentChat({
 
   async function send(text: string) {
     if (!text.trim() || busy || reveal) return;
+    // Blur the focused control (input/chip) so the browser doesn't scroll it into view on the
+    // reflow that follows, which was nudging the whole page down on every send.
+    (document.activeElement as HTMLElement | null)?.blur?.();
     const next: ChatMessage[] = [...messages, { role: "user", content: text }];
     setMessages(next);
     setInput("");
@@ -136,6 +139,7 @@ export function AgentChat({
   }
 
   async function runAction(a: AgentAction) {
+    (document.activeElement as HTMLElement | null)?.blur?.(); // avoid focus-scroll on the reflow
     // Auto-Pilot isn't an on-chain tx here; it just configures the loop on its own tab.
     if (a.type === "enableAutoPilot") {
       onAutoPilot?.(a.strategy, Number(a.cap) || 5);

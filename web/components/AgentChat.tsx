@@ -64,7 +64,10 @@ export function AgentChat({
   // message immediately), which was the auto-scroll-to-bottom bug.
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (!el) return;
+    // Scroll the chat container ONLY (never the page), and only when the user is already near the
+    // bottom, so reading earlier messages is never yanked. scrollIntoView used to drag the window.
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 140) el.scrollTop = el.scrollHeight;
   }, [messages, busy, reveal]);
 
   // Proactive: once a wallet connects and on-chain state loads, the Guardian speaks first

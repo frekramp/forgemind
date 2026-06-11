@@ -65,7 +65,7 @@ export function Dashboard() {
           <ConnectGate onDemo={() => setDemo(true)} />
         ) : (
           <div className="space-y-5">
-            {isDemo && <DemoBanner onExit={() => setDemo(false)} />}
+            {isDemo && <DemoBanner onExit={() => { setDemo(false); setTab("overview"); }} />}
             {!isVaultDeployed && !isDemo && <DeployBanner />}
             <Tabs active={tab} onChange={setTab} />
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
@@ -271,7 +271,7 @@ const HERO_EMBERS = [
 function ConnectGate({ onDemo }: { onDemo: () => void }) {
   const features = [
     { n: "01", icon: ShieldCheck, title: "Stack & Grow", desc: "Hold zkLTC 1:1, or deploy it for a simulated 5% APY." },
-    { n: "02", icon: Bot, title: "On-chain agent", desc: "It reads live state, reasons, and executes real txns you sign." },
+    { n: "02", icon: Bot, title: "Agentic, not a chatbot", desc: "It reads live on-chain state, reasons, executes real txns you sign, and records every decision." },
     { n: "03", icon: TrendingUp, title: "Auto-Pilot", desc: "A keeper that compounds & rebalances autonomously, 24/7." },
   ];
   return (
@@ -303,6 +303,7 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
       </div>
 
       <div className="relative flex flex-col items-center">
+        <span className="label animate-rise-in mb-4 text-ember">Agentic AI on LiteForge · LitVM</span>
         <h1
           className="font-display animate-rise-in max-w-4xl text-balance text-[2.6rem] font-normal leading-[1.04] tracking-[-0.02em] sm:text-[4.75rem]"
         >
@@ -313,8 +314,9 @@ function ConnectGate({ onDemo }: { onDemo: () => void }) {
           className="animate-rise-in mx-auto mt-5 max-w-xl text-balance text-[15px] leading-relaxed text-muted"
           style={{ animationDelay: "130ms" }}
         >
-          Chat with an on-chain agent that executes real transactions. Switch modes, set a halving goal, and let it
-          run your stack <span className="text-text">autonomously</span> toward the next Litecoin halving.
+          A truly <span className="text-text">agentic AI</span> on LitVM, not just a chatbot. It reads your on-chain
+          vault, reasons, executes real transactions you sign, and notarizes every decision on-chain, running your
+          stack <span className="text-text">autonomously</span> toward the next Litecoin halving.
         </p>
 
         <div className="animate-rise-in mt-9 flex flex-col items-center gap-2.5" style={{ animationDelay: "190ms" }}>
@@ -387,7 +389,7 @@ function DemoBanner({ onExit }: { onExit: () => void }) {
       </span>
       <button
         onClick={onExit}
-        className="ml-auto flex shrink-0 items-center gap-1 text-[11px] text-dim transition-colors hover:text-ember"
+        className="ml-auto flex shrink-0 items-center gap-1 rounded-full border border-ember/40 bg-ember/10 px-2.5 py-1 text-[11px] font-medium text-ember transition-colors hover:bg-ember/20"
       >
         <X size={12} /> Exit demo
       </button>
@@ -399,8 +401,8 @@ function Footer() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-1 px-5 py-4 text-[11px] text-dim sm:flex-row">
-        <span>ForgeMind · AI smart vault for zkLTC</span>
-        <span>Built on LiteForge (LitVM) · chain 4441 · gas in zkLTC</span>
+        <span>ForgeMind · an agentic AI vault for zkLTC</span>
+        <span>Built on LiteForge · LitVM · chain 4441 · gas in zkLTC</span>
       </div>
     </footer>
   );

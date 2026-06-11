@@ -80,8 +80,8 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
           >
             <span
               className={cn(
-                "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
-                notarize ? "translate-x-4" : "translate-x-0.5"
+                "absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ease-out",
+                notarize ? "translate-x-4" : "translate-x-0"
               )}
             />
           </button>
@@ -96,7 +96,7 @@ export function AgentDecisions({ al }: { al: ActionLog }) {
             (<span className="text-ember">Forge Guardian</span> vs. rule-based) and a reason: a verifiable trail of{" "}
             <span className="text-text">why</span>, paired with the vault&apos;s record of <span className="text-text">what</span>.
             Autonomous keeper moves are signed by the agent&apos;s key and{" "}
-            <span className="inline-flex items-center gap-0.5 text-gain"><ShieldCheck size={11} /> verified</span> on-chain. Proof, not a claim.
+            <span className="font-medium text-gain">verified</span> on-chain. Proof, not a claim.
           </span>
         </div>
 

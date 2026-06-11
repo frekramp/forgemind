@@ -9,7 +9,7 @@ import { fmtNum } from "@/lib/format";
 import { useCountUp } from "@/hooks/useCountUp";
 import type { useVault } from "@/hooks/useVault";
 import { cn } from "@/lib/cn";
-import { ArrowDownLeft, ArrowUpRight, Coins, Info, Loader2, Shield, TrendingUp } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, Coins, Info, Loader2, Shield, TrendingUp } from "lucide-react";
 
 async function safe(fn: () => Promise<unknown>) {
   try {
@@ -23,12 +23,23 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const s = v.state;
   const [dep, setDep] = useState("");
   const [wd, setWd] = useState("");
+  const [flash, setFlash] = useState<string | null>(null);
   const busy = v.txPending || v.txConfirming;
   const isGrow = s?.mode === Mode.Grow;
   const total = s?.total ?? 0;
   const totalAnim = useCountUp(total);
   const pending = s?.pendingYield ?? 0;
   const withdrawable = isGrow ? s?.growPrincipal ?? 0 : s?.stack ?? 0;
+
+  // Claiming pays accrued yield OUT to your wallet (it leaves the vault), so the Total balance
+  // drops by that amount. Surface where it went, otherwise the drop reads as a loss.
+  const claim = () =>
+    safe(async () => {
+      const amt = pending;
+      await v.claimYield();
+      setFlash(`Claimed ${fmtNum(amt, 4)} zkLTC to your wallet. Your staked principal is unchanged.`);
+      window.setTimeout(() => setFlash(null), 5000);
+    });
 
   return (
     <Panel
@@ -60,14 +71,21 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
           </div>
           {isGrow && pending > 0 && (
             <button
-              onClick={() => safe(v.claimYield)}
+              onClick={claim}
               disabled={busy}
+              title="Sends your accrued yield to your wallet. Your staked principal stays in the vault."
               className="flex items-center gap-1.5 rounded-lg border border-gain/30 bg-gain/5 px-3 py-2 text-sm text-gain transition-colors hover:bg-gain/10 disabled:opacity-50"
             >
-              <Coins size={14} /> Claim +{fmtNum(pending, 4)}
+              <Coins size={14} /> Claim {fmtNum(pending, 4)} to wallet
             </button>
           )}
         </div>
+
+        {flash && (
+          <div className="flex items-center gap-2 rounded-lg border border-gain/30 bg-gain/5 px-3 py-2 text-xs text-gain">
+            <Check size={13} className="shrink-0" /> {flash}
+          </div>
+        )}
 
         <ModeToggle mode={s?.mode ?? Mode.Stack} disabled={busy} onChange={(m) => safe(() => v.setMode(m))} />
 

@@ -72,18 +72,30 @@ export function useKeeper() {
     return h;
   }
 
+  // Demo keeper is a real, in-memory grant so Delegate / Revoke / Run actually work without a wallet.
+  const [demoAuth, setDemoAuth] = useState<KeeperAuth>(() => ({
+    compound: true,
+    rebalance: true,
+    expiry: Math.floor(Date.now() / 1000) + 6 * 86400,
+  }));
+
   // ⚠️ #5: all hooks above run unconditionally (rules-of-hooks compliant). The returns below
   // are render-time branches - do NOT add hooks past this point.
   if (isDemo) {
-    const noop = async (): Promise<undefined> => undefined;
     return {
-      auth: { compound: true, rebalance: true, expiry: now + 6 * 86400 },
+      auth: demoAuth,
       agentConfigured: true,
-      active: true,
+      active: demoAuth.expiry > now && (demoAuth.compound || demoAuth.rebalance),
       busy: false,
-      authorize: noop,
-      revoke: noop,
-      refetch: noop,
+      authorize: async (compound: boolean, rebalance: boolean, durationSec: number): Promise<undefined> => {
+        setDemoAuth({ compound, rebalance, expiry: Math.floor(Date.now() / 1000) + durationSec });
+        return undefined;
+      },
+      revoke: async (): Promise<undefined> => {
+        setDemoAuth({ compound: false, rebalance: false, expiry: 0 });
+        return undefined;
+      },
+      refetch: async (): Promise<undefined> => undefined,
     };
   }
 

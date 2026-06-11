@@ -6,6 +6,8 @@ import { Panel } from "./ui/panel";
 import { Button } from "./ui/button";
 import { useKeeper } from "@/hooks/useKeeper";
 import type { useVault } from "@/hooks/useVault";
+import { useDemoMode } from "./DemoProvider";
+import { DEMO_ADDRESS } from "@/lib/demo";
 import { fmtNum, shortAddr, nowSec } from "@/lib/format";
 import { liteforge } from "@/lib/chains";
 import { cn } from "@/lib/cn";
@@ -24,9 +26,10 @@ type RunResult = { ran: number; actions: { user: string; action: string; txHash:
 export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const k = useKeeper();
   const { isConnected } = useAccount();
+  const { isDemo } = useDemoMode();
   // The delegation/run buttons can only do something with a wallet AND a keeper agent set on the
   // vault. Otherwise they'd be clickable but silently no-op - so we disable + explain instead.
-  const canDelegate = isConnected && k.agentConfigured;
+  const canDelegate = (isConnected || isDemo) && k.agentConfigured;
   const [compound, setCompound] = useState(true);
   const [rebalance, setRebalance] = useState(true);
   const [durIdx, setDurIdx] = useState(1);
@@ -39,6 +42,15 @@ export function KeeperPanel({ v }: { v: ReturnType<typeof useVault> }) {
   async function runKeeper() {
     setRunning(true);
     try {
+      if (isDemo) {
+        // Simulate a cycle so the demo shows the keeper acting (the real endpoint serves live users).
+        await new Promise((r) => setTimeout(r, 700));
+        setRun({
+          ran: 1,
+          actions: [{ user: DEMO_ADDRESS, action: "auto-compounded 7.42 zkLTC yield", txHash: `0x${"ab".repeat(32)}` }],
+        });
+        return;
+      }
       const res = await fetch("/api/keeper", { method: "POST" });
       setRun(await res.json());
     } catch {

@@ -86,6 +86,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+    // Land at the top of the new view, not wherever the previous page was scrolled (e.g. clicking
+    // "See it live in the demo" from the How-it-works section near the bottom of the landing).
+    if (typeof window !== "undefined") window.scrollTo(0, 0);
   }, []);
 
   const deposit = useCallback(async (amt: string) => {

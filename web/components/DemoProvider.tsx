@@ -132,7 +132,12 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const claimYield = useCallback(async () => {
-    setCore((c) => ({ ...c, wallet: clamp(c.wallet + c.pendingYield), pendingYield: 0 }));
+    // Compound yield into principal so the total keeps growing (claiming reads as a gain, not a
+    // drop). On mainnet the contract pays yield out to your wallet instead.
+    setCore((c) => {
+      const bucket = c.mode === Mode.Grow ? { growPrincipal: c.growPrincipal + c.pendingYield } : { stack: c.stack + c.pendingYield };
+      return { ...c, ...bucket, pendingYield: 0 };
+    });
     return undefined;
   }, []);
 

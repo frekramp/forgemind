@@ -9,6 +9,7 @@ import { fmtNum } from "@/lib/format";
 import { useCountUp } from "@/hooks/useCountUp";
 import type { useVault } from "@/hooks/useVault";
 import { cn } from "@/lib/cn";
+import { useDemoMode } from "./DemoProvider";
 import { ArrowDownLeft, ArrowUpRight, Check, Coins, Info, Loader2, Shield, TrendingUp } from "lucide-react";
 
 async function safe(fn: () => Promise<unknown>) {
@@ -24,6 +25,7 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const [dep, setDep] = useState("");
   const [wd, setWd] = useState("");
   const [flash, setFlash] = useState<string | null>(null);
+  const { isDemo } = useDemoMode();
   const busy = v.txPending || v.txConfirming;
   const isGrow = s?.mode === Mode.Grow;
   const total = s?.total ?? 0;
@@ -31,13 +33,17 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
   const pending = s?.pendingYield ?? 0;
   const withdrawable = isGrow ? s?.growPrincipal ?? 0 : s?.stack ?? 0;
 
-  // Claiming pays accrued yield OUT to your wallet (it leaves the vault), so the Total balance
-  // drops by that amount. Surface where it went, otherwise the drop reads as a loss.
+  // In the demo, claiming COMPOUNDS yield into your stack so the total keeps growing; on a real
+  // wallet the contract pays it out (the total drops by that amount). Surface which one happened.
   const claim = () =>
     safe(async () => {
       const amt = pending;
       await v.claimYield();
-      setFlash(`Claimed ${fmtNum(amt, 4)} zkLTC to your wallet. Your staked principal is unchanged.`);
+      setFlash(
+        isDemo
+          ? `Compounded ${fmtNum(amt, 4)} zkLTC into your stack. Your total keeps growing.`
+          : `Claimed ${fmtNum(amt, 4)} zkLTC to your wallet. Your staked principal is unchanged.`
+      );
       window.setTimeout(() => setFlash(null), 5000);
     });
 
@@ -73,10 +79,10 @@ export function VaultPanel({ v }: { v: ReturnType<typeof useVault> }) {
             <button
               onClick={claim}
               disabled={busy}
-              title="Sends your accrued yield to your wallet. Your staked principal stays in the vault."
+              title={isDemo ? "Compounds your accrued yield into your stack, so your total keeps growing." : "Sends your accrued yield to your wallet. Your staked principal stays in the vault."}
               className="flex items-center gap-1.5 rounded-lg border border-gain/30 bg-gain/5 px-3 py-2 text-sm text-gain transition-colors hover:bg-gain/10 disabled:opacity-50"
             >
-              <Coins size={14} /> Claim {fmtNum(pending, 4)} to wallet
+              <Coins size={14} /> {isDemo ? `Compound ${fmtNum(pending, 4)}` : `Claim ${fmtNum(pending, 4)} to wallet`}
             </button>
           )}
         </div>

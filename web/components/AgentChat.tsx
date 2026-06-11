@@ -11,7 +11,8 @@ import { engineFromString, kindForAction } from "@/lib/actionlog";
 import { chatOpeningInsight } from "@/lib/insight";
 import { toWei } from "@/lib/format";
 import { useDemoMode } from "./DemoProvider";
-import { Send, Loader2, Check, BrainCircuit, ChevronDown, ChevronUp, Cog, ShieldCheck, TrendingUp, Target, Bot } from "lucide-react";
+import { liteforge } from "@/lib/chains";
+import { Send, Loader2, Check, BrainCircuit, ChevronDown, ChevronUp, Cog, ShieldCheck, TrendingUp, Target, Bot, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const CHIPS = ["How safe is my stack?", "Am I on pace?", "Switch to Grow", "Claim my yield"];
@@ -128,22 +129,45 @@ export function AgentChat({
   }
 
   async function runAction(a: AgentAction) {
+    // Auto-Pilot isn't an on-chain tx here; it just configures the loop on its own tab.
+    if (a.type === "enableAutoPilot") {
+      onAutoPilot?.(a.strategy, Number(a.cap) || 5);
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: "Auto-Pilot is set up. Open the Auto-Pilot tab and press Start to arm it. Nothing runs until you do." },
+      ]);
+      return;
+    }
     try {
       let amountWei = 0n;
+      let h: `0x${string}` | undefined;
       if (a.type === "deposit") {
         amountWei = toWei(a.amount);
-        await v.deposit(a.amount);
+        h = await v.deposit(a.amount);
       } else if (a.type === "withdraw") {
         amountWei = toWei(a.amount);
-        await v.withdraw(a.amount);
-      } else if (a.type === "setMode") await v.setMode(a.mode as Mode);
-      else if (a.type === "setGoal") {
+        h = await v.withdraw(a.amount);
+      } else if (a.type === "setMode") {
+        h = await v.setMode(a.mode as Mode);
+      } else if (a.type === "setGoal") {
         amountWei = toWei(a.amount);
-        await v.setGoal(a.amount);
-      } else if (a.type === "claimYield") await v.claimYield();
-      else if (a.type === "enableAutoPilot") {
-        onAutoPilot?.(a.strategy, Number(a.cap) || 5);
+        h = await v.setGoal(a.amount);
+      } else if (a.type === "claimYield") {
+        h = await v.claimYield();
       }
+
+      // Confirm to the user that it went through. The chat was silent here before, so an
+      // executed action looked like nothing happened ("stays stale").
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          content: isDemo
+            ? `Done. ${a.label} is reflected in your demo vault.`
+            : `Submitted. ${a.label} is confirming on-chain now, your balance will update in a moment.`,
+          txHash: h,
+        },
+      ]);
 
       // Notarize the agent's decision on-chain (separate, user-signed tx). No-op when
       // ForgeActionLog isn't deployed or the user turned notarizing off.
@@ -156,7 +180,10 @@ export function AgentChat({
         }
       }
     } catch {
-      /* user rejected */
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: `${a.label} was cancelled or failed in your wallet. Nothing changed, you can try it again.` },
+      ]);
     }
   }
 
@@ -188,6 +215,16 @@ export function AgentChat({
             >
               {m.content}
             </div>
+            {m.role === "assistant" && m.txHash && (
+              <a
+                href={`${liteforge.blockExplorers.default.url}/tx/${m.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 font-mono text-[11px] text-ember hover:underline"
+              >
+                View transaction <ExternalLink size={11} />
+              </a>
+            )}
             {m.role === "assistant" && m.trace && m.trace.length > 0 && <ReasoningTrace steps={m.trace} />}
             {m.actions && m.actions.length > 0 && (
               <div className="flex flex-wrap gap-2">

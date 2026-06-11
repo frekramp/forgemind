@@ -23,6 +23,7 @@ export type ChatMessage = {
   content: string;
   actions?: AgentAction[];
   trace?: TraceStep[];
+  txHash?: string; // on-chain tx an executed action produced, surfaced as an explorer link
 };
 
 export type AgentResponse = {
